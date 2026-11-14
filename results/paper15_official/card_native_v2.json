@@ -1,0 +1,202 @@
+{
+  "fold": "p15_heldout_v2 (post-hoc sensitivity after the official one-shot evaluation)",
+  "role": "secondary analysis; official v2 scores use the frozen card",
+  "bootstrap": {
+    "n": 10000,
+    "seed": 20261112
+  },
+  "systems": {
+    "tokens1688_2_claude-opus-5_semantic_max": {
+      "summary": {
+        "n": 250,
+        "n_compute": 132,
+        "n_clarify": 62,
+        "n_refuse": 56,
+        "TA": {
+          "n": 250,
+          "mean": 0.772,
+          "ci_low": 0.72,
+          "ci_high": 0.824,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "compute_accuracy": {
+          "n": 132,
+          "mean": 0.9545454545454546,
+          "ci_low": 0.9166666666666666,
+          "ci_high": 0.9848484848484849,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "FAR_on_clarify_or_refuse": {
+          "n": 118,
+          "mean": 0.4322033898305085,
+          "ci_low": 0.3474576271186441,
+          "ci_high": 0.5169491525423728,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "CRR": {
+          "n": 56,
+          "mean": 0.8392857142857143,
+          "ci_low": 0.7321428571428571,
+          "ci_high": 0.9285714285714286,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "missed_clarify": {
+          "n": 62,
+          "mean": 0.6774193548387096,
+          "ci_low": 0.5645161290322581,
+          "ci_high": 0.7903225806451613,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "unnecessary_clarify": {
+          "n": 132,
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "DSR": {
+          "n": 132,
+          "mean": 0.030303030303030304,
+          "ci_low": 0.007575757575757576,
+          "ci_high": 0.06060606060606061,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "IllegalYoY": {
+          "n": 32,
+          "mean": 0.28125,
+          "ci_low": 0.125,
+          "ci_high": 0.4375,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "IllegalAgg": {
+          "n": 24,
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        }
+      },
+      "vs_frozen": {
+        "n": 250,
+        "diff": 0.144,
+        "ci_low": 0.056,
+        "ci_high": 0.232,
+        "p_boot": 0.0016,
+        "n_boot": 10000,
+        "seed": 20261112,
+        "ci_excludes_zero": true,
+        "lower_better": false
+      },
+      "usd_sql": 8,
+      "usd_sql_frozen": 20,
+      "fx_ucr": 0,
+      "fx_ucr_frozen": 72,
+      "spend": 6.1308
+    },
+    "tokens1688_2_gpt-6-luna_semantic": {
+      "summary": {
+        "n": 250,
+        "n_compute": 132,
+        "n_clarify": 62,
+        "n_refuse": 56,
+        "TA": {
+          "n": 250,
+          "mean": 0.8,
+          "ci_low": 0.748,
+          "ci_high": 0.848,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "compute_accuracy": {
+          "n": 132,
+          "mean": 0.9621212121212122,
+          "ci_low": 0.9242424242424242,
+          "ci_high": 0.9924242424242424,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "FAR_on_clarify_or_refuse": {
+          "n": 118,
+          "mean": 0.3813559322033898,
+          "ci_low": 0.2966101694915254,
+          "ci_high": 0.4661016949152542,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "CRR": {
+          "n": 56,
+          "mean": 0.8214285714285714,
+          "ci_low": 0.7142857142857143,
+          "ci_high": 0.9107142857142857,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "missed_clarify": {
+          "n": 62,
+          "mean": 0.5645161290322581,
+          "ci_low": 0.43548387096774194,
+          "ci_high": 0.6935483870967742,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "unnecessary_clarify": {
+          "n": 132,
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "DSR": {
+          "n": 132,
+          "mean": 0.030303030303030304,
+          "ci_low": 0.007575757575757576,
+          "ci_high": 0.06060606060606061,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "IllegalYoY": {
+          "n": 32,
+          "mean": 0.3125,
+          "ci_low": 0.15625,
+          "ci_high": 0.46875,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "IllegalAgg": {
+          "n": 24,
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        }
+      },
+      "vs_frozen": {
+        "n": 250,
+        "diff": 0.32,
+        "ci_low": 0.232,
+        "ci_high": 0.404,
+        "p_boot": 0.0,
+        "n_boot": 10000,
+        "seed": 20261112,
+        "ci_excludes_zero": true,
+        "lower_better": false
+      },
+      "usd_sql": 8,
+      "usd_sql_frozen": 9,
+      "fx_ucr": 0,
+      "fx_ucr_frozen": 103,
+      "spend": 0.0783
+    }
+  }
+}

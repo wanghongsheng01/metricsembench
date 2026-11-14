@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use MetricSemBench, please cite it as below."
+title: "MetricSemBench: reproducibility package"
+version: "1.0-pvldb-submission"
+date-released: "2026-11-13"
+license: MIT
+repository-code: "https://github.com/wanghongsheng01/metricsembench"
+authors:
+  - family-names: Wang
+    given-names: Hongsheng
+    affiliation: "Zhejiang University"
+  - family-names: Deng
+    given-names: Dazhen
+    affiliation: "Zhejiang University"
+keywords: [text-to-SQL, benchmark, metric semantics, clarification, abstention, TPC-DS]

@@ -1,0 +1,13 @@
+{
+  "title": "MetricSemBench: reproducibility package (PVLDB EA&B submission)",
+  "upload_type": "software",
+  "description": "Frozen benchmark splits, generator, evaluator, stored per-item predictions, and a one-command script that regenerates the TPC-DS SF=1 warehouse and every table of the MetricSemBench paper without a paid call.",
+  "creators": [
+    {"name": "Wang, Hongsheng", "affiliation": "Zhejiang University"},
+    {"name": "Deng, Dazhen", "affiliation": "Zhejiang University"}
+  ],
+  "license": "MIT",
+  "keywords": ["text-to-SQL", "benchmark", "metric semantics", "clarification", "abstention", "TPC-DS"],
+  "version": "1.0-pvldb-submission",
+  "notes": "Code: MIT. TPC-DS-derived data and stored predictions: CC BY 4.0. BIRD/Spider 2.0 material keeps its upstream licenses."
+}

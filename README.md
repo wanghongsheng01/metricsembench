@@ -24,18 +24,18 @@ three TPC-DS folds from the generator and checks that ids, questions, gold and p
 identical to the frozen payloads; (6) re-executes every gold and paired SQL (mechanical audit);
 (7) recomputes every table of the paper from the **stored per-item predictions**; (8) compares
 the regenerated numbers with the shipped snapshot (`ALL MATCH`); (9) checks that the evaluator
-refuses the companion paper's official TEST folds.
+refuses the companion paper's test splits.
 
 ## Folds
 
 | Fold | Role | n (compute/clarify/refuse) | Freeze SHA-256 |
 |---|---|---|---|
 | `tasks/msb_v0.1_tasks.json` | DEV / diagnostic fixture | 85 (44/21/20) | (in file) |
-| `tasks/msb_p15_heldout_v1_tasks.json` | official held-out v1, one-shot | 94 (54/26/14) | `03d26b59…53e55cb2` |
-| `tasks/msb_p15_heldout_v2_tasks.json` | official held-out v2, pre-registered (`docs/PREREG_P15_HELDOUT_V2.md`), one-shot | 250 (132/62/56) | `abe30e25…68c4db97` |
+| `tasks/msb_p15_heldout_v1_tasks.json` | hash-frozen held-out test split v1, one-shot | 94 (54/26/14) | `03d26b59…53e55cb2` |
+| `tasks/msb_p15_heldout_v2_tasks.json` | pre-registered held-out test split v2 (`docs/PREREG_P15_HELDOUT_V2.md`), hash-frozen, one-shot | 250 (132/62/56) | `abe30e25…68c4db97` |
 | `data/public_bench/msb_public_overlay_v1_150.json` | BIRD/Spider transfer overlay | 167 (TA denominator 148) | `4d8bd8fa…758f3c12` |
 
-Official SHA convention: SHA-256 of the payload without the `sha256` key, serialized with
+SHA convention: SHA-256 of the payload without the `sha256` key, serialized with
 `json.dumps(..., indent=2, sort_keys=True, ensure_ascii=False, default=str)` plus a newline.
 Fold identity is the *freeze* SHA (`evaluated=false`); the `evaluated` flag is bookkeeping.
 
@@ -45,11 +45,11 @@ Fold identity is the *freeze* SHA (`evaluated=false`); the `evaluated` flag is b
 |---|---|---|
 | Decision-flip atlas (population prevalence) | `msb.prevalence_atlas`, `msb.paper15_stats` | `results/paper15_official/prevalence_atlas.json`, `prevalence_calendar_yoy.json` |
 | v0.1 profile, EX-vs-TA inversion, paired tests | `msb.paper15_stats`, `msb.frontier_stats`, `msb.score_codes` | `msb_v0.1_ci.json`, `msb_v0.1_frontier_ci.json`, `msb_v0.1_codes_ci.json` |
-| Official held-out v1 | `msb.eval_heldout_deterministic`, `msb.frontier_stats` | `msb_p15_heldout_v1_deterministic.json`, `msb_p15_heldout_v1_frontier_ci.json` |
-| Official held-out v2 (main table) | `msb.paper15_v2_stats` (+ `msb.score_codes_v2`) | `msb_p15_heldout_v2_ci.json` |
+| Held-out split v1 | `msb.eval_heldout_deterministic`, `msb.frontier_stats` | `msb_p15_heldout_v1_deterministic.json`, `msb_p15_heldout_v1_frontier_ci.json` |
+| Pre-registered held-out split v2 (main table) | `msb.paper15_v2_stats` (+ `msb.score_codes_v2`) | `msb_p15_heldout_v2_ci.json` |
 | Mix robustness (balanced TA, crossover w*) | `msb.paper15_mix_analysis` | `mix_robustness.json` |
 | Per-axis TA on v2 | `msb.paper15_v2_axis` | `v2_per_axis_ta.json` |
-| Card-convention sensitivity (DEV, v0.1) | `msb.card_ablation_stats` (runs: `msb.run_card_ablation`) | `card_native_v01.json` |
+| Card-convention sensitivity (v0.1 DEV; post-hoc on held-out split v2) | `msb.card_ablation_stats` (runs: `msb.run_card_ablation [--fold v2]`) | `card_native_v01.json`, `card_native_v2.json` |
 | Public-overlay transfer | `msb.paper15_stats` | `msb_public_v1_167_ci.json` |
 | Gold audit | `msb.audit_gold`, `msb.audit_gold_v2` | `gold_audit_v1.json`, `gold_audit_v2.json` |
 
@@ -62,7 +62,7 @@ contrasts; Kendall tau between Compute-Acc (EX-like) ranks and TA ranks.
 Stored predictions are sufficient for every table. To re-query a model, point the bundled
 OpenAI-compatible shim (`llmhub/__init__.py`) at your endpoint (`MSB_LLM_BASE_URL`,
 `MSB_LLM_API_KEY`) and run e.g. `python -m msb.run_heldout_v2 --system <name>` (no `--limit` on
-official folds; JSONL resume). Our runs used commercial OpenAI-compatible relays for the
+held-out splits; JSONL resume). Our runs used commercial OpenAI-compatible relays for the
 named model snapshots; channel names appear in the stored rows. CodeS-7B
 (`seeklhy/codes-7b-spider`) is run with `msb/run_codes_gpu.py` (4-bit NF4, beam 4) and scored
 with `msb.score_codes` / `msb.score_codes_v2`.
@@ -70,19 +70,31 @@ with `msb.score_codes` / `msb.score_codes_v2`.
 ## Protocol
 
 Gold, disagreement gates (sign: opposite signs and both |YoY| ≥ 1 pp; magnitude: gap ≥ 2 pp),
-numeric tolerance (abs 1e-4, rel 1e-5) and the schema card are frozen before any official score.
-Official LLM evaluation is one-shot per fold. The v2 fold, its systems and its secondary metrics
+numeric tolerance (abs 1e-4, rel 1e-5) and the schema card are frozen before any held-out score.
+Held-out LLM evaluation is one-shot per split. The v2 fold, its systems and its secondary metrics
 were pre-registered before any v2 score (`docs/PREREG_P15_HELDOUT_V2.md`).
 
 ## What is not included
 
 The DuckDB warehouse and the TPC-DS extension binary are regenerated, not shipped. Upstream
 BIRD/Spider databases are obtained from their publishers. No enterprise data, customer
-identifier, or internal metric name is included. Official TEST folds of a companion method
+identifier, or internal metric name is included. Test splits of a companion method
 paper are not included and are refused by `msb/forbidden_folds.py`. The dictionary-grounded
 reference protocol is reported in the paper as a profile point; its stored predictions are
 included, its code belongs to the companion submission.
 
-## License
+## Licensing
 
-Code: MIT (`LICENSE`). Data: see `DATA_LICENSE.md`.
+| Part | License |
+|---|---|
+| Code (`msb/`, `llmhub/`, `scripts/`) | MIT (`LICENSE`) |
+| TPC-DS-derived task payloads (`tasks/`), stored predictions and derived statistics (`results/`) | CC BY 4.0 (`DATA_LICENSE.md`) |
+| BIRD Mini-Dev / Spider 2.0-lite material quoted in `data/public_bench/` | upstream licenses of BIRD and Spider 2.0 (not relicensed) |
+
+The TPC-DS warehouse is not redistributed; it is regenerated with DuckDB's `dsdgen`. TPC-DS is a
+trademark of the Transaction Processing Performance Council. Per-directory notices:
+`tasks/LICENSE_NOTICE.md`, `results/LICENSE_NOTICE.md`, `data/public_bench/LICENSE_NOTICE.md`.
+
+## Citation
+
+See `CITATION.cff`. An archived release is provided through the Zenodo GitHub integration.

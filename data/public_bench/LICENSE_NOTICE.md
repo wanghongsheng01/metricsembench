@@ -1,0 +1,2 @@
+# License notice — data/public_bench/
+This overlay quotes questions, evidence and SQL from BIRD Mini-Dev (https://github.com/bird-bench/mini_dev) and Spider 2.0-lite (https://github.com/xlang-ai/Spider2). Those parts remain under their upstream licenses and are not relicensed by this package. Our added annotations (gold behavior labels and metadata) are CC BY 4.0. Upstream databases are not redistributed.
