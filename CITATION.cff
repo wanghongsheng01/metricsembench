@@ -5,6 +5,9 @@ version: "1.0-pvldb-submission"
 date-released: "2026-11-13"
 license: MIT
 repository-code: "https://github.com/wanghongsheng01/metricsembench"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24217077"
 authors:
   - family-names: Wang
     given-names: Hongsheng

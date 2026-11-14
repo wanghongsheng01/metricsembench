@@ -1,5 +1,7 @@
 # MetricSemBench — reproducibility package
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24217077.svg)](https://doi.org/10.5281/zenodo.24217077)
+
 Artifact of the PVLDB Volume 20 Experiment, Analysis & Benchmark submission
 *MetricSemBench: When Legitimate Metric Definitions Flip Business Conclusions — and When
 Systems Should Compute, Clarify, or Refuse* (Hongsheng Wang, Dazhen Deng).
@@ -97,4 +99,8 @@ trademark of the Transaction Processing Performance Council. Per-directory notic
 
 ## Citation
 
-See `CITATION.cff`. An archived release is provided through the Zenodo GitHub integration.
+See `CITATION.cff`. The reproducibility package is archived on Zenodo:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24217077.svg)](https://doi.org/10.5281/zenodo.24217077)
+
+DOI: [10.5281/zenodo.24217077](https://doi.org/10.5281/zenodo.24217077)
