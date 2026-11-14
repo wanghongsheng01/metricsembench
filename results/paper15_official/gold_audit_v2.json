@@ -1,0 +1,114 @@
+{
+  "p15_heldout_v2": {
+    "path": "./tasks/msb_p15_heldout_v2_tasks.json",
+    "n": 250,
+    "n_declared": 250,
+    "counts_declared": {
+      "type:calendar": 90,
+      "behavior:clarify": 62,
+      "sign_disagreement": 0,
+      "behavior:compute": 132,
+      "type:lifecycle": 24,
+      "type:currency": 24,
+      "behavior:refuse": 56,
+      "type:non_additive": 32,
+      "type:denominator": 48,
+      "type:sparse_completeness": 32
+    },
+    "behaviors": {
+      "clarify": 62,
+      "compute": 132,
+      "refuse": 56
+    },
+    "types": {
+      "calendar": 90,
+      "lifecycle": 24,
+      "currency": 24,
+      "non_additive": 32,
+      "denominator": 48,
+      "sparse_completeness": 32
+    },
+    "subtypes": {
+      "month_vs_rolling30_yoy": 72,
+      "calendar_year_vs_retail_fy_yoy": 18,
+      "new_product_sales_share": 24,
+      "raw_vs_usd_converted": 16,
+      "raw_sum_claimed_as_usd": 8,
+      "aov": 8,
+      "aov_illegal_sum": 8,
+      "margin_rate": 8,
+      "margin_rate_illegal_sum": 8,
+      "return_rate_amt_vs_qty": 24,
+      "channel_scope": 24,
+      "item_month_yoy_sparse_prior": 12,
+      "brand_month_yoy_sparse_prior": 12,
+      "incomplete_retail_fy": 4,
+      "incomplete_calendar_year": 4
+    },
+    "evaluated": true,
+    "sha_field": "abe30e25701882ef9ad3b9a53fefbe641b8c7aa2b0932b0cf8dab11d68c4db97",
+    "raw_rehash": "3a200f39e89ef280a22121d1984747d5c021571bd3465545400ec7dbcaf997cd",
+    "freeze_sha": "abe30e25701882ef9ad3b9a53fefbe641b8c7aa2b0932b0cf8dab11d68c4db97",
+    "issues": [
+      "see ok block"
+    ],
+    "ok": {
+      "n_compute": 132,
+      "n_clarify": 62,
+      "n_refuse": 56,
+      "gold_sql_checked": 132,
+      "gold_sql_match": 132,
+      "paired_checked": 436,
+      "paired_match": 436,
+      "handbook_struct_ok": 242,
+      "handbook_struct_fail": [
+        [
+          "msb_p15_heldout_v2_cal_clarify_043",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v2_cal_clarify_052",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v2_cal_clarify_070",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v2_life_clarify_newshare_home_2002",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v2_life_clarify_newshare_shoes_2002",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v2_life_clarify_newshare_music_2002",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v2_life_clarify_newshare_men_2002",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v2_den_clarify_return_2000_01",
+          "paired values equal — not a real conflict"
+        ]
+      ],
+      "unique_ids": true,
+      "unique_questions": true,
+      "n_sign_disagreement": 0
+    }
+  },
+  "overlap": {
+    "msb_v0.1_tasks.json": {
+      "id_overlap": [],
+      "question_overlap": []
+    },
+    "msb_p15_heldout_v1_tasks.json": {
+      "id_overlap": [],
+      "question_overlap": []
+    }
+  },
+  "note": "Mechanical verification; not a dual-human kappa."
+}

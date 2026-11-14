@@ -1,0 +1,715 @@
+{
+  "populations": {
+    "A_calendar_month_vs_r30__store": {
+      "n": 528,
+      "sign": 3,
+      "sign_rate": 0.005681818181818182,
+      "mag": 45,
+      "mag_rate": 0.08522727272727272
+    },
+    "A_calendar_month_vs_r30__web": {
+      "n": 528,
+      "sign": 5,
+      "sign_rate": 0.00946969696969697,
+      "mag": 106,
+      "mag_rate": 0.20075757575757575
+    },
+    "A_calendar_month_vs_r30__catalog": {
+      "n": 528,
+      "sign": 4,
+      "sign_rate": 0.007575757575757576,
+      "mag": 56,
+      "mag_rate": 0.10606060606060606
+    },
+    "B_calendar_year_vs_retail_fy__store": {
+      "n": 22,
+      "sign": 0,
+      "sign_rate": 0.0,
+      "mag": 0,
+      "mag_rate": 0.0
+    },
+    "B_calendar_year_vs_retail_fy__web": {
+      "n": 22,
+      "sign": 0,
+      "sign_rate": 0.0,
+      "mag": 2,
+      "mag_rate": 0.09090909090909091
+    },
+    "B_calendar_year_vs_retail_fy__catalog": {
+      "n": 22,
+      "sign": 0,
+      "sign_rate": 0.0,
+      "mag": 0,
+      "mag_rate": 0.0
+    },
+    "C_usd_vs_raw_mixed__store": {
+      "n": 528,
+      "sign": 1,
+      "sign_rate": 0.001893939393939394,
+      "mag": 51,
+      "mag_rate": 0.09659090909090909
+    },
+    "D_store_only_vs_all_channels": {
+      "n": 528,
+      "sign": 43,
+      "sign_rate": 0.08143939393939394,
+      "mag": 263,
+      "mag_rate": 0.4981060606060606
+    },
+    "E_return_rate_amt_vs_qty__store": {
+      "n": 48,
+      "sign": 4,
+      "sign_rate": 0.08333333333333333,
+      "mag": 25,
+      "mag_rate": 0.5208333333333334
+    },
+    "E_return_rate_amt_vs_qty__web": {
+      "n": 48,
+      "sign": 7,
+      "sign_rate": 0.14583333333333334,
+      "mag": 35,
+      "mag_rate": 0.7291666666666666
+    },
+    "E_return_rate_amt_vs_qty__catalog": {
+      "n": 48,
+      "sign": 2,
+      "sign_rate": 0.041666666666666664,
+      "mag": 25,
+      "mag_rate": 0.5208333333333334
+    }
+  },
+  "total": {
+    "n": 2850,
+    "sign": 69,
+    "mag": 608,
+    "sign_rate": 0.024210526315789474,
+    "mag_rate": 0.21333333333333335
+  },
+  "flips": [
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "store",
+      "cat": null,
+      "yr": 2000,
+      "moy": 2,
+      "a": 0.019240434007705004,
+      "b": -0.01157354229134519
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "store",
+      "cat": "Books",
+      "yr": 2001,
+      "moy": 2,
+      "a": -0.020680373646528416,
+      "b": 0.012058014513217705
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "store",
+      "cat": "Sports",
+      "yr": 2000,
+      "moy": 2,
+      "a": 0.02675474261275888,
+      "b": -0.020158199479935884
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "web",
+      "cat": "Books",
+      "yr": 1999,
+      "moy": 1,
+      "a": 0.10846022693966924,
+      "b": -0.026729457627956737
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "web",
+      "cat": "Books",
+      "yr": 2000,
+      "moy": 7,
+      "a": -0.018612723031872037,
+      "b": 0.02866180240819476
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "web",
+      "cat": "Electronics",
+      "yr": 2002,
+      "moy": 3,
+      "a": -0.05461522727454419,
+      "b": 0.017666742148179444
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "web",
+      "cat": "Home",
+      "yr": 2002,
+      "moy": 1,
+      "a": 0.038265105713191236,
+      "b": -0.02370594294686582
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "web",
+      "cat": "Jewelry",
+      "yr": 2001,
+      "moy": 2,
+      "a": -0.02318450787247054,
+      "b": 0.021395041864394077
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "catalog",
+      "cat": "Electronics",
+      "yr": 2000,
+      "moy": 5,
+      "a": -0.025944701390292535,
+      "b": 0.03136519299961646
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "catalog",
+      "cat": "Electronics",
+      "yr": 2001,
+      "moy": 2,
+      "a": -0.020735124167648614,
+      "b": 0.024115712276736586
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "catalog",
+      "cat": "Sports",
+      "yr": 2000,
+      "moy": 2,
+      "a": 0.012951843039964698,
+      "b": -0.041629782852932694
+    },
+    {
+      "axis": "calendar_month_vs_rolling30",
+      "channel": "catalog",
+      "cat": "Sports",
+      "yr": 2000,
+      "moy": 3,
+      "a": 0.030625580461880943,
+      "b": -0.010541212905084743
+    },
+    {
+      "axis": "usd_vs_raw_mixed",
+      "channel": "store",
+      "cat": "Shoes",
+      "yr": 2002,
+      "moy": 5,
+      "a": 0.011564067618421468,
+      "b": -0.011428100660432226
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Books",
+      "yr": 1999,
+      "moy": 2,
+      "a": -0.03376129782989712,
+      "b": 0.025952781752059575
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Books",
+      "yr": 1999,
+      "moy": 6,
+      "a": -0.039627460342265976,
+      "b": 0.053797576166757365
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Books",
+      "yr": 2002,
+      "moy": 12,
+      "a": 0.02904760343914288,
+      "b": -0.010319068820981795
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Children",
+      "yr": 2000,
+      "moy": 6,
+      "a": 0.02571220172250336,
+      "b": -0.04669795884739004
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Children",
+      "yr": 2001,
+      "moy": 12,
+      "a": -0.034399011156824186,
+      "b": 0.010139445826936508
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Children",
+      "yr": 2002,
+      "moy": 2,
+      "a": -0.04205417451318183,
+      "b": 0.010453273311228944
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Electronics",
+      "yr": 1999,
+      "moy": 6,
+      "a": -0.032324421020995385,
+      "b": 0.036739933487430154
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Electronics",
+      "yr": 2000,
+      "moy": 11,
+      "a": 0.029040947463224397,
+      "b": -0.014034000410160601
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Electronics",
+      "yr": 2001,
+      "moy": 3,
+      "a": -0.02808044491195845,
+      "b": 0.014535096253947
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Electronics",
+      "yr": 2001,
+      "moy": 10,
+      "a": 0.027830763672541402,
+      "b": -0.01223515649461728
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Electronics",
+      "yr": 2002,
+      "moy": 6,
+      "a": -0.015503244867051692,
+      "b": 0.016520586427258448
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Home",
+      "yr": 1999,
+      "moy": 5,
+      "a": -0.01277229826572295,
+      "b": 0.02291485149678805
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Home",
+      "yr": 2000,
+      "moy": 1,
+      "a": -0.016642190101035955,
+      "b": 0.028517826557305906
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Home",
+      "yr": 2000,
+      "moy": 2,
+      "a": -0.014570573935194137,
+      "b": 0.030145554994673043
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Home",
+      "yr": 2000,
+      "moy": 7,
+      "a": 0.020431951259738384,
+      "b": -0.04377233600541771
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Home",
+      "yr": 2001,
+      "moy": 4,
+      "a": 0.017226042258243382,
+      "b": -0.010364583903330962
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Home",
+      "yr": 2001,
+      "moy": 9,
+      "a": -0.01976685663658394,
+      "b": 0.018677325370695306
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Home",
+      "yr": 2002,
+      "moy": 3,
+      "a": 0.060443408609704874,
+      "b": -0.016735169191791247
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Home",
+      "yr": 2002,
+      "moy": 6,
+      "a": -0.010796410078623279,
+      "b": 0.025049341586335705
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Jewelry",
+      "yr": 1999,
+      "moy": 10,
+      "a": -0.03759483361140988,
+      "b": 0.01769528076565188
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Jewelry",
+      "yr": 2000,
+      "moy": 12,
+      "a": -0.01893269744606818,
+      "b": 0.013761753443775875
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Jewelry",
+      "yr": 2002,
+      "moy": 6,
+      "a": -0.027125011249872846,
+      "b": 0.015938899776216438
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Jewelry",
+      "yr": 2002,
+      "moy": 12,
+      "a": 0.01701712139363591,
+      "b": -0.01839132949435026
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Men",
+      "yr": 1999,
+      "moy": 4,
+      "a": 0.07201547023025448,
+      "b": -0.020259835609555146
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Men",
+      "yr": 2001,
+      "moy": 11,
+      "a": -0.03122417497898236,
+      "b": 0.016234941763953455
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Men",
+      "yr": 2002,
+      "moy": 4,
+      "a": -0.019137693291614716,
+      "b": 0.010551117766356189
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Men",
+      "yr": 2002,
+      "moy": 9,
+      "a": 0.036268193212052394,
+      "b": -0.01274588987768308
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Music",
+      "yr": 1999,
+      "moy": 7,
+      "a": -0.03349492540642447,
+      "b": 0.018277555885577494
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Music",
+      "yr": 2000,
+      "moy": 8,
+      "a": 0.028993692391613028,
+      "b": -0.024372947159432876
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Music",
+      "yr": 2001,
+      "moy": 5,
+      "a": -0.019979757263123208,
+      "b": 0.017845249647426592
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Music",
+      "yr": 2001,
+      "moy": 12,
+      "a": -0.026624870646443262,
+      "b": 0.024287231494401196
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Music",
+      "yr": 2002,
+      "moy": 9,
+      "a": 0.03419150654543931,
+      "b": -0.0298084914317478
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Music",
+      "yr": 2002,
+      "moy": 10,
+      "a": 0.0158011603849822,
+      "b": -0.02966563901357269
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Shoes",
+      "yr": 2000,
+      "moy": 12,
+      "a": 0.01137608801386873,
+      "b": -0.017589259299871547
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Shoes",
+      "yr": 2001,
+      "moy": 4,
+      "a": -0.01485786407225781,
+      "b": 0.03840301710006317
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Sports",
+      "yr": 1999,
+      "moy": 4,
+      "a": 0.02343685144766823,
+      "b": -0.010439909089751984
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Sports",
+      "yr": 1999,
+      "moy": 5,
+      "a": 0.029731118104569732,
+      "b": -0.020150420824836823
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Sports",
+      "yr": 2001,
+      "moy": 6,
+      "a": -0.027483971282806764,
+      "b": 0.015083862505039632
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Sports",
+      "yr": 2001,
+      "moy": 8,
+      "a": -0.011522246102245972,
+      "b": 0.02010619590857462
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Women",
+      "yr": 1999,
+      "moy": 3,
+      "a": 0.020285746897728097,
+      "b": -0.023939081835435753
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Women",
+      "yr": 1999,
+      "moy": 5,
+      "a": -0.01992560764006996,
+      "b": 0.010249445043743208
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Women",
+      "yr": 1999,
+      "moy": 8,
+      "a": -0.031011079825273874,
+      "b": 0.013711091810269155
+    },
+    {
+      "axis": "store_only_vs_all_channels",
+      "channel": "all",
+      "cat": "Women",
+      "yr": 2000,
+      "moy": 12,
+      "a": -0.020364808670801968,
+      "b": 0.01725781844776014
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "store",
+      "cat": null,
+      "yr": 1999,
+      "moy": 7,
+      "a": -0.03418701446113497,
+      "b": 0.02874363358228723
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "store",
+      "cat": null,
+      "yr": 2001,
+      "moy": 11,
+      "a": -0.011498317670173583,
+      "b": 0.013546695431506748
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "store",
+      "cat": null,
+      "yr": 2002,
+      "moy": 2,
+      "a": -0.018927534654274155,
+      "b": 0.015091288936258615
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "store",
+      "cat": null,
+      "yr": 2002,
+      "moy": 3,
+      "a": 0.022625086021461457,
+      "b": -0.05367067257331147
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "web",
+      "cat": null,
+      "yr": 2001,
+      "moy": 2,
+      "a": 0.021163620819848288,
+      "b": -0.050339720675160904
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "web",
+      "cat": null,
+      "yr": 2001,
+      "moy": 5,
+      "a": -0.05779082187740828,
+      "b": 0.02386137413952812
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "web",
+      "cat": null,
+      "yr": 2001,
+      "moy": 9,
+      "a": -0.019381114263781047,
+      "b": 0.013156116014547158
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "web",
+      "cat": null,
+      "yr": 2001,
+      "moy": 11,
+      "a": -0.030632197763877808,
+      "b": 0.057464194062333405
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "web",
+      "cat": null,
+      "yr": 2001,
+      "moy": 12,
+      "a": 0.016975758154850144,
+      "b": -0.028740340835703544
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "web",
+      "cat": null,
+      "yr": 2002,
+      "moy": 7,
+      "a": -0.027042447877157764,
+      "b": 0.019894554017318253
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "web",
+      "cat": null,
+      "yr": 2002,
+      "moy": 8,
+      "a": -0.027762569074551362,
+      "b": 0.04442397903493085
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "catalog",
+      "cat": null,
+      "yr": 1999,
+      "moy": 10,
+      "a": 0.024946619607424687,
+      "b": -0.02906749852822696
+    },
+    {
+      "axis": "return_rate_amount_vs_quantity",
+      "channel": "catalog",
+      "cat": null,
+      "yr": 2001,
+      "moy": 3,
+      "a": -0.024068286117782656,
+      "b": 0.01122261133042043
+    }
+  ],
+  "gates": {
+    "sign": "opposite signs, both |YoY| >= 1 pp",
+    "magnitude": "|gap| >= 2 pp and |first| >= 1 pp (includes sign flips, as in Table 3)"
+  }
+}

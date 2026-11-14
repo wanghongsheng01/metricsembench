@@ -1,0 +1,3453 @@
+{
+  "version": "v0.1",
+  "source": "DuckDB official dsdgen TPC-DS SF=1",
+  "dictionary": {
+    "version": "v0.1",
+    "metrics": [
+      {
+        "id": "store_net_paid",
+        "name": "store net sales",
+        "aliases": [
+          "store sales",
+          "store net paid",
+          "销售额",
+          "销售收入"
+        ],
+        "additive": true,
+        "currency_sensitive": true,
+        "time_grain_required": true,
+        "default_grain": "calendar_month",
+        "default_currency": "raw_local_sum",
+        "sql_template": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE {date_pred}",
+        "usd_sql_template": "SELECT SUM(net_paid_usd) FROM msb_store_sales WHERE {date_pred}"
+      },
+      {
+        "id": "store_aov",
+        "name": "store average order value",
+        "aliases": [
+          "AOV",
+          "average order value",
+          "客单价"
+        ],
+        "additive": false,
+        "currency_sensitive": true,
+        "time_grain_required": true,
+        "default_grain": "calendar_year",
+        "sql_template": "SELECT SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0) FROM msb_store_sales WHERE {date_pred}"
+      },
+      {
+        "id": "store_net_paid_yoy",
+        "name": "store net sales year-over-year growth",
+        "aliases": [
+          "YoY",
+          "year-over-year",
+          "同比"
+        ],
+        "additive": false,
+        "requires_prior_period": true,
+        "invalid_if_prior_sparse": true,
+        "default_grain": "calendar_month",
+        "alternate_grains": [
+          "rolling_30",
+          "retail_fy"
+        ]
+      },
+      {
+        "id": "new_product_sales_share",
+        "name": "new product sales share",
+        "aliases": [
+          "new product share",
+          "新品销售占比"
+        ],
+        "additive": false,
+        "definitions": [
+          "first_sale_in_period",
+          "catalog_rec_start_in_period"
+        ]
+      },
+      {
+        "id": "active_item_rate",
+        "name": "active item rate",
+        "aliases": [
+          "动销率"
+        ],
+        "additive": false,
+        "denominator_defs": [
+          "in_catalog",
+          "all_items",
+          "intersection_catalog_and_sold"
+        ]
+      },
+      {
+        "id": "return_rate",
+        "name": "store return rate",
+        "aliases": [
+          "退货率"
+        ],
+        "additive": false,
+        "denominator_defs": [
+          "return_amt_over_sales_amt",
+          "return_qty_over_sales_qty"
+        ]
+      }
+    ],
+    "grains": {
+      "calendar_month": "first to last calendar day of the named month",
+      "rolling_30": "30 consecutive days ending on the last calendar day of the named month",
+      "calendar_year": "Jan 1 to Dec 31 of the named year",
+      "retail_fy": "Feb 1 of year Y through Jan 31 of year Y+1"
+    },
+    "notes": "This dictionary is a public TPC-DS overlay. It is not an enterprise metric dictionary. Currency uses the documented metricsem_fx_v1 extension."
+  },
+  "n_tasks": 85,
+  "counts": {
+    "type:calendar": 39,
+    "behavior:clarify": 21,
+    "sign_disagreement": 9,
+    "behavior:compute": 44,
+    "type:sparse_completeness": 14,
+    "behavior:refuse": 20,
+    "type:lifecycle": 9,
+    "type:currency": 6,
+    "type:non_additive": 8,
+    "type:denominator": 9
+  },
+  "tasks": [
+    {
+      "id": "msb_v0.1_cal_clarify_001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for February 2000?",
+      "question_zh": "2000年2月门店净销售额 in the Sports category的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '1999-02-28' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.0267547426127589,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-30' AND DATE '1999-02-28' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.020158199479935773,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": true,
+      "metadata": {
+        "yr": 2000,
+        "moy": 2,
+        "cat": "Sports",
+        "cal_yoy": 0.02675474261275888,
+        "r30_yoy": -0.020158199479935683,
+        "sign_d": true,
+        "gap": 0.04691294209269456,
+        "calendar_span": [
+          "2000-02-01",
+          "2000-02-29"
+        ],
+        "rolling30_span": [
+          "2000-01-31",
+          "2000-02-29"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_002",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for calendar month February 2000 (2000-02-01 to 2000-02-29 vs 1999-02-01 to 1999-02-28)?",
+      "question_zh": "按自然月（2000-02-01–2000-02-29 对比 1999-02-01–1999-02-28），2000年2月门店净销售额 in the Sports category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '1999-02-28' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.0267547426127589,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-30' AND DATE '1999-02-28' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.020158199479935773,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '1999-02-28' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.0267547426127589,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": true,
+      "metadata": {
+        "yr": 2000,
+        "moy": 2,
+        "cat": "Sports",
+        "cal_yoy": 0.02675474261275888,
+        "r30_yoy": -0.020158199479935683,
+        "sign_d": true,
+        "gap": 0.04691294209269456,
+        "calendar_span": [
+          "2000-02-01",
+          "2000-02-29"
+        ],
+        "rolling30_span": [
+          "2000-01-31",
+          "2000-02-29"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_003",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for the rolling 30-day window ending 2000-02-29 (2000-01-31 to 2000-02-29 vs 1999-01-30 to 1999-02-28)?",
+      "question_zh": "按滚动30天（2000-01-31–2000-02-29 对比 1999-01-30–1999-02-28），门店净销售额 in the Sports category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '1999-02-28' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.0267547426127589,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-30' AND DATE '1999-02-28' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.020158199479935773,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-30' AND DATE '1999-02-28' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": -0.020158199479935773,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": true,
+      "metadata": {
+        "yr": 2000,
+        "moy": 2,
+        "cat": "Sports",
+        "cal_yoy": 0.02675474261275888,
+        "r30_yoy": -0.020158199479935683,
+        "sign_d": true,
+        "gap": 0.04691294209269456,
+        "calendar_span": [
+          "2000-02-01",
+          "2000-02-29"
+        ],
+        "rolling30_span": [
+          "2000-01-31",
+          "2000-02-29"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_004",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Books category for February 2001?",
+      "question_zh": "2001年2月门店净销售额 in the Books category的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-02-01' AND DATE '2001-02-28' AND (i_category = 'Books')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29' AND (i_category = 'Books')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.02068037364652833,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-30' AND DATE '2001-02-28' AND (i_category = 'Books')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29' AND (i_category = 'Books')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.01205801451321763,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": true,
+      "metadata": {
+        "yr": 2001,
+        "moy": 2,
+        "cat": "Books",
+        "cal_yoy": -0.0206803736465282,
+        "r30_yoy": 0.012058014513217705,
+        "sign_d": true,
+        "gap": 0.032738388159745904,
+        "calendar_span": [
+          "2001-02-01",
+          "2001-02-28"
+        ],
+        "rolling30_span": [
+          "2001-01-30",
+          "2001-02-28"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_005",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Books category for calendar month February 2001 (2001-02-01 to 2001-02-28 vs 2000-02-01 to 2000-02-29)?",
+      "question_zh": "按自然月（2001-02-01–2001-02-28 对比 2000-02-01–2000-02-29），2001年2月门店净销售额 in the Books category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-02-01' AND DATE '2001-02-28' AND (i_category = 'Books')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29' AND (i_category = 'Books')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.02068037364652833,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-30' AND DATE '2001-02-28' AND (i_category = 'Books')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29' AND (i_category = 'Books')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.01205801451321763,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-02-01' AND DATE '2001-02-28' AND (i_category = 'Books')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29' AND (i_category = 'Books')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": -0.02068037364652833,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": true,
+      "metadata": {
+        "yr": 2001,
+        "moy": 2,
+        "cat": "Books",
+        "cal_yoy": -0.0206803736465282,
+        "r30_yoy": 0.012058014513217705,
+        "sign_d": true,
+        "gap": 0.032738388159745904,
+        "calendar_span": [
+          "2001-02-01",
+          "2001-02-28"
+        ],
+        "rolling30_span": [
+          "2001-01-30",
+          "2001-02-28"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_006",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Books category for the rolling 30-day window ending 2001-02-28 (2001-01-30 to 2001-02-28 vs 2000-01-31 to 2000-02-29)?",
+      "question_zh": "按滚动30天（2001-01-30–2001-02-28 对比 2000-01-31–2000-02-29），门店净销售额 in the Books category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-02-01' AND DATE '2001-02-28' AND (i_category = 'Books')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29' AND (i_category = 'Books')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.02068037364652833,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-30' AND DATE '2001-02-28' AND (i_category = 'Books')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29' AND (i_category = 'Books')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.01205801451321763,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-30' AND DATE '2001-02-28' AND (i_category = 'Books')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29' AND (i_category = 'Books')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.01205801451321763,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": true,
+      "metadata": {
+        "yr": 2001,
+        "moy": 2,
+        "cat": "Books",
+        "cal_yoy": -0.0206803736465282,
+        "r30_yoy": 0.012058014513217705,
+        "sign_d": true,
+        "gap": 0.032738388159745904,
+        "calendar_span": [
+          "2001-02-01",
+          "2001-02-28"
+        ],
+        "rolling30_span": [
+          "2001-01-30",
+          "2001-02-28"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_007",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales for February 2000?",
+      "question_zh": "2000年2月门店净销售额的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '1999-02-28'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.0192404340077049,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-30' AND DATE '1999-02-28'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.011573542291345124,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": true,
+      "metadata": {
+        "yr": 2000,
+        "moy": 2,
+        "cat": null,
+        "cal_yoy": 0.019240434007704827,
+        "r30_yoy": -0.01157354229134519,
+        "sign_d": true,
+        "gap": 0.030813976299050017,
+        "calendar_span": [
+          "2000-02-01",
+          "2000-02-29"
+        ],
+        "rolling30_span": [
+          "2000-01-31",
+          "2000-02-29"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_008",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales for calendar month February 2000 (2000-02-01 to 2000-02-29 vs 1999-02-01 to 1999-02-28)?",
+      "question_zh": "按自然月（2000-02-01–2000-02-29 对比 1999-02-01–1999-02-28），2000年2月门店净销售额的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '1999-02-28'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.0192404340077049,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-30' AND DATE '1999-02-28'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.011573542291345124,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '1999-02-28'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.0192404340077049,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": true,
+      "metadata": {
+        "yr": 2000,
+        "moy": 2,
+        "cat": null,
+        "cal_yoy": 0.019240434007704827,
+        "r30_yoy": -0.01157354229134519,
+        "sign_d": true,
+        "gap": 0.030813976299050017,
+        "calendar_span": [
+          "2000-02-01",
+          "2000-02-29"
+        ],
+        "rolling30_span": [
+          "2000-01-31",
+          "2000-02-29"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_009",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales for the rolling 30-day window ending 2000-02-29 (2000-01-31 to 2000-02-29 vs 1999-01-30 to 1999-02-28)?",
+      "question_zh": "按滚动30天（2000-01-31–2000-02-29 对比 1999-01-30–1999-02-28），门店净销售额的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2000-02-29'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '1999-02-28'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.0192404340077049,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-30' AND DATE '1999-02-28'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.011573542291345124,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-31' AND DATE '2000-02-29'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-30' AND DATE '1999-02-28'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": -0.011573542291345124,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": true,
+      "metadata": {
+        "yr": 2000,
+        "moy": 2,
+        "cat": null,
+        "cal_yoy": 0.019240434007704827,
+        "r30_yoy": -0.01157354229134519,
+        "sign_d": true,
+        "gap": 0.030813976299050017,
+        "calendar_span": [
+          "2000-02-01",
+          "2000-02-29"
+        ],
+        "rolling30_span": [
+          "2000-01-31",
+          "2000-02-29"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_010",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Men category for January 1999?",
+      "question_zh": "1999年1月门店净销售额 in the Men category的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Men')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Men')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2537396196035451,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Men')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Men')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.11041925648399249,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Men",
+        "cal_yoy": 0.2537396196035452,
+        "r30_yoy": 0.11041925648399255,
+        "sign_d": false,
+        "gap": 0.14332036311955265,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_011",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Men category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?",
+      "question_zh": "按自然月（1999-01-01–1999-01-31 对比 1998-01-01–1998-01-31），1999年1月门店净销售额 in the Men category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Men')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Men')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2537396196035451,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Men')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Men')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.11041925648399249,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Men')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Men')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.2537396196035451,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Men",
+        "cal_yoy": 0.2537396196035452,
+        "r30_yoy": 0.11041925648399255,
+        "sign_d": false,
+        "gap": 0.14332036311955265,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_012",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Men category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?",
+      "question_zh": "按滚动30天（1999-01-02–1999-01-31 对比 1998-01-02–1998-01-31），门店净销售额 in the Men category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Men')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Men')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2537396196035451,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Men')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Men')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.11041925648399249,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Men')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Men')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.11041925648399249,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Men",
+        "cal_yoy": 0.2537396196035452,
+        "r30_yoy": 0.11041925648399255,
+        "sign_d": false,
+        "gap": 0.14332036311955265,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_013",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Home category for January 1999?",
+      "question_zh": "1999年1月门店净销售额 in the Home category的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Home')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Home')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2653716500623688,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Home')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Home')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.12507511334542232,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Home",
+        "cal_yoy": 0.2653716500623689,
+        "r30_yoy": 0.12507511334542237,
+        "sign_d": false,
+        "gap": 0.14029653671694653,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_014",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Home category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?",
+      "question_zh": "按自然月（1999-01-01–1999-01-31 对比 1998-01-01–1998-01-31），1999年1月门店净销售额 in the Home category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Home')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Home')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2653716500623688,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Home')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Home')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.12507511334542232,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Home')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Home')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.2653716500623688,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Home",
+        "cal_yoy": 0.2653716500623689,
+        "r30_yoy": 0.12507511334542237,
+        "sign_d": false,
+        "gap": 0.14029653671694653,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_015",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Home category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?",
+      "question_zh": "按滚动30天（1999-01-02–1999-01-31 对比 1998-01-02–1998-01-31），门店净销售额 in the Home category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Home')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Home')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2653716500623688,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Home')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Home')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.12507511334542232,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Home')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Home')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.12507511334542232,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Home",
+        "cal_yoy": 0.2653716500623689,
+        "r30_yoy": 0.12507511334542237,
+        "sign_d": false,
+        "gap": 0.14029653671694653,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_016",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Jewelry category for January 1999?",
+      "question_zh": "1999年1月门店净销售额 in the Jewelry category的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Jewelry')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Jewelry')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2895431711824665,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Jewelry')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Jewelry')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.15715923616125993,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Jewelry",
+        "cal_yoy": 0.2895431711824665,
+        "r30_yoy": 0.15715923616126,
+        "sign_d": false,
+        "gap": 0.13238393502120646,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_017",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Jewelry category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?",
+      "question_zh": "按自然月（1999-01-01–1999-01-31 对比 1998-01-01–1998-01-31），1999年1月门店净销售额 in the Jewelry category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Jewelry')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Jewelry')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2895431711824665,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Jewelry')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Jewelry')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.15715923616125993,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Jewelry')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Jewelry')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.2895431711824665,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Jewelry",
+        "cal_yoy": 0.2895431711824665,
+        "r30_yoy": 0.15715923616126,
+        "sign_d": false,
+        "gap": 0.13238393502120646,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_018",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Jewelry category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?",
+      "question_zh": "按滚动30天（1999-01-02–1999-01-31 对比 1998-01-02–1998-01-31），门店净销售额 in the Jewelry category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Jewelry')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Jewelry')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2895431711824665,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Jewelry')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Jewelry')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.15715923616125993,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Jewelry')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Jewelry')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.15715923616125993,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Jewelry",
+        "cal_yoy": 0.2895431711824665,
+        "r30_yoy": 0.15715923616126,
+        "sign_d": false,
+        "gap": 0.13238393502120646,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_019",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Music category for January 1999?",
+      "question_zh": "1999年1月门店净销售额 in the Music category的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Music')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Music')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.207993258758096,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Music')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Music')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.07698809758109401,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Music",
+        "cal_yoy": 0.20799325875809613,
+        "r30_yoy": 0.07698809758109404,
+        "sign_d": false,
+        "gap": 0.1310051611770021,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_020",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Music category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?",
+      "question_zh": "按自然月（1999-01-01–1999-01-31 对比 1998-01-01–1998-01-31），1999年1月门店净销售额 in the Music category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Music')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Music')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.207993258758096,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Music')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Music')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.07698809758109401,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Music')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Music')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.207993258758096,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Music",
+        "cal_yoy": 0.20799325875809613,
+        "r30_yoy": 0.07698809758109404,
+        "sign_d": false,
+        "gap": 0.1310051611770021,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_021",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Music category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?",
+      "question_zh": "按滚动30天（1999-01-02–1999-01-31 对比 1998-01-02–1998-01-31），门店净销售额 in the Music category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Music')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Music')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.207993258758096,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Music')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Music')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.07698809758109401,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Music')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Music')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.07698809758109401,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Music",
+        "cal_yoy": 0.20799325875809613,
+        "r30_yoy": 0.07698809758109404,
+        "sign_d": false,
+        "gap": 0.1310051611770021,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_022",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for January 1999?",
+      "question_zh": "1999年1月门店净销售额 in the Sports category的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.24857555360520978,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.11856202214791466,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Sports",
+        "cal_yoy": 0.24857555360520955,
+        "r30_yoy": 0.11856202214791449,
+        "sign_d": false,
+        "gap": 0.13001353145729505,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_023",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?",
+      "question_zh": "按自然月（1999-01-01–1999-01-31 对比 1998-01-01–1998-01-31），1999年1月门店净销售额 in the Sports category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.24857555360520978,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.11856202214791466,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.24857555360520978,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Sports",
+        "cal_yoy": 0.24857555360520955,
+        "r30_yoy": 0.11856202214791449,
+        "sign_d": false,
+        "gap": 0.13001353145729505,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_024",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?",
+      "question_zh": "按滚动30天（1999-01-02–1999-01-31 对比 1998-01-02–1998-01-31），门店净销售额 in the Sports category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.24857555360520978,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.11856202214791466,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Sports')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Sports')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.11856202214791466,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Sports",
+        "cal_yoy": 0.24857555360520955,
+        "r30_yoy": 0.11856202214791449,
+        "sign_d": false,
+        "gap": 0.13001353145729505,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_025",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales for January 1999?",
+      "question_zh": "1999年1月门店净销售额的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.23226653722013924,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.10819163358379018,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": null,
+        "cal_yoy": 0.23226653722013924,
+        "r30_yoy": 0.10819163358379016,
+        "sign_d": false,
+        "gap": 0.12407490363634907,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_026",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?",
+      "question_zh": "按自然月（1999-01-01–1999-01-31 对比 1998-01-01–1998-01-31），1999年1月门店净销售额的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.23226653722013924,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.10819163358379018,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.23226653722013924,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": null,
+        "cal_yoy": 0.23226653722013924,
+        "r30_yoy": 0.10819163358379016,
+        "sign_d": false,
+        "gap": 0.12407490363634907,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_027",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?",
+      "question_zh": "按滚动30天（1999-01-02–1999-01-31 对比 1998-01-02–1998-01-31），门店净销售额的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.23226653722013924,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.10819163358379018,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.10819163358379018,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": null,
+        "cal_yoy": 0.23226653722013924,
+        "r30_yoy": 0.10819163358379016,
+        "sign_d": false,
+        "gap": 0.12407490363634907,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_028",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Shoes category for January 1999?",
+      "question_zh": "1999年1月门店净销售额 in the Shoes category的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Shoes')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Shoes')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2891759640058381,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Shoes')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Shoes')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.1658323693345051,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Shoes",
+        "cal_yoy": 0.28917596400583806,
+        "r30_yoy": 0.16583236933450496,
+        "sign_d": false,
+        "gap": 0.1233435946713331,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_029",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Shoes category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?",
+      "question_zh": "按自然月（1999-01-01–1999-01-31 对比 1998-01-01–1998-01-31），1999年1月门店净销售额 in the Shoes category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Shoes')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Shoes')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2891759640058381,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Shoes')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Shoes')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.1658323693345051,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Shoes')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Shoes')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.2891759640058381,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Shoes",
+        "cal_yoy": 0.28917596400583806,
+        "r30_yoy": 0.16583236933450496,
+        "sign_d": false,
+        "gap": 0.1233435946713331,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_030",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Shoes category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?",
+      "question_zh": "按滚动30天（1999-01-02–1999-01-31 对比 1998-01-02–1998-01-31），门店净销售额 in the Shoes category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Shoes')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Shoes')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.2891759640058381,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Shoes')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Shoes')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.1658323693345051,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Shoes')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Shoes')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.1658323693345051,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Shoes",
+        "cal_yoy": 0.28917596400583806,
+        "r30_yoy": 0.16583236933450496,
+        "sign_d": false,
+        "gap": 0.1233435946713331,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_031",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Children category for January 1999?",
+      "question_zh": "1999年1月门店净销售额 in the Children category的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Children')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Children')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.23945692711645422,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Children')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Children')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.11973538384006574,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Children",
+        "cal_yoy": 0.2394569271164543,
+        "r30_yoy": 0.11973538384006584,
+        "sign_d": false,
+        "gap": 0.11972154327638847,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_032",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Children category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?",
+      "question_zh": "按自然月（1999-01-01–1999-01-31 对比 1998-01-01–1998-01-31），1999年1月门店净销售额 in the Children category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Children')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Children')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.23945692711645422,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Children')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Children')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.11973538384006574,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_month",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Children')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Children')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.23945692711645422,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Children",
+        "cal_yoy": 0.2394569271164543,
+        "r30_yoy": 0.11973538384006584,
+        "sign_d": false,
+        "gap": 0.11972154327638847,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_033",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales in the Children category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?",
+      "question_zh": "按滚动30天（1999-01-02–1999-01-31 对比 1998-01-02–1998-01-31），门店净销售额 in the Children category的同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_month",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-01-31' AND (i_category = 'Children')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-01' AND DATE '1998-01-31' AND (i_category = 'Children')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.23945692711645422,
+          "unit": "ratio"
+        },
+        {
+          "id": "rolling_30",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Children')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Children')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.11973538384006574,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "rolling_30",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-02' AND DATE '1999-01-31' AND (i_category = 'Children')\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1998-01-02' AND DATE '1998-01-31' AND (i_category = 'Children')\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.11973538384006574,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 1999,
+        "moy": 1,
+        "cat": "Children",
+        "cal_yoy": 0.2394569271164543,
+        "r30_yoy": 0.11973538384006584,
+        "sign_d": false,
+        "gap": 0.11972154327638847,
+        "calendar_span": [
+          "1999-01-01",
+          "1999-01-31"
+        ],
+        "rolling30_span": [
+          "1999-01-02",
+          "1999-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_fy_clarify_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales for 2000?",
+      "question_zh": "2000年门店净销售额的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_year",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-01' AND DATE '2000-12-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-12-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.01890785997410977,
+          "unit": "ratio"
+        },
+        {
+          "id": "retail_fy",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2001-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '2000-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.014657220527955584,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "sign_d": false,
+        "cal_yoy": 0.01890785997410977,
+        "fy_yoy": 0.014657220527955584,
+        "fy_span": [
+          "2000-02-01",
+          "2001-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_fy_compute_cal_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales for calendar year 2000 (January 1 to December 31 2000 vs the same span in 1999)?",
+      "question_zh": "按自然年（1月1日–12月31日），2000年门店净销售额同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_year",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-01' AND DATE '2000-12-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-12-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.01890785997410977,
+          "unit": "ratio"
+        },
+        {
+          "id": "retail_fy",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2001-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '2000-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.014657220527955584,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_year",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-01' AND DATE '2000-12-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-12-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.01890785997410977,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "sign_d": false,
+        "cal_yoy": 0.01890785997410977,
+        "fy_yoy": 0.014657220527955584,
+        "fy_span": [
+          "2000-02-01",
+          "2001-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_fy_compute_fy_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales for retail fiscal year 2000 (February 1 2000 to January 31 2001 vs February 1 1999 to January 31 2000)?",
+      "question_zh": "按零售财年（2000-02-01 至 2001-01-31），2000财年门店净销售额同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_year",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-01' AND DATE '2000-12-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-01-01' AND DATE '1999-12-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.01890785997410977,
+          "unit": "ratio"
+        },
+        {
+          "id": "retail_fy",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2001-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '2000-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": 0.014657220527955584,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "retail_fy",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2001-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '1999-02-01' AND DATE '2000-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": 0.014657220527955584,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "sign_d": false,
+        "cal_yoy": 0.01890785997410977,
+        "fy_yoy": 0.014657220527955584,
+        "fy_span": [
+          "2000-02-01",
+          "2001-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_fy_clarify_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "clarify",
+      "question_en": "What was the year-over-year growth rate of store net sales for 2001?",
+      "question_zh": "2001年门店净销售额的同比增长率是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_year",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-01' AND DATE '2000-12-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.018641043571777274,
+          "unit": "ratio"
+        },
+        {
+          "id": "retail_fy",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-02-01' AND DATE '2002-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2001-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.006895703038769824,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "sign_d": false,
+        "cal_yoy": -0.018641043571777274,
+        "fy_yoy": -0.006895703038769824,
+        "fy_span": [
+          "2001-02-01",
+          "2002-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_fy_compute_cal_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales for calendar year 2001 (January 1 to December 31 2001 vs the same span in 2000)?",
+      "question_zh": "按自然年（1月1日–12月31日），2001年门店净销售额同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_year",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-01' AND DATE '2000-12-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.018641043571777274,
+          "unit": "ratio"
+        },
+        {
+          "id": "retail_fy",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-02-01' AND DATE '2002-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2001-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.006895703038769824,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "calendar_year",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-01' AND DATE '2000-12-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": -0.018641043571777274,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "sign_d": false,
+        "cal_yoy": -0.018641043571777274,
+        "fy_yoy": -0.006895703038769824,
+        "fy_span": [
+          "2001-02-01",
+          "2002-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_fy_compute_fy_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "compute",
+      "question_en": "What was the year-over-year growth rate of store net sales for retail fiscal year 2001 (February 1 2001 to January 31 2002 vs February 1 2000 to January 31 2001)?",
+      "question_zh": "按零售财年（2001-02-01 至 2002-01-31），2001财年门店净销售额同比是多少？",
+      "paired_definitions": [
+        {
+          "id": "calendar_year",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-01-01' AND DATE '2000-12-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.018641043571777274,
+          "unit": "ratio"
+        },
+        {
+          "id": "retail_fy",
+          "sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-02-01' AND DATE '2002-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2001-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+          "value": -0.006895703038769824,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "retail_fy",
+      "gold_sql": "WITH cur AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-02-01' AND DATE '2002-01-31'\n    ),\n    prev AS (\n      SELECT SUM(ss_net_paid) AS amt FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2000-02-01' AND DATE '2001-01-31'\n    )\n    SELECT (cur.amt - prev.amt) * 1.0 / NULLIF(prev.amt, 0) FROM cur, prev",
+      "gold_value": -0.006895703038769824,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "sign_d": false,
+        "cal_yoy": -0.018641043571777274,
+        "fy_yoy": -0.006895703038769824,
+        "fy_span": [
+          "2001-02-01",
+          "2002-01-31"
+        ]
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_refuse_incomplete_fy2002",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "incomplete_retail_fy",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for retail fiscal year 2002 (February 1 2002 to January 31 2003)?",
+      "question_zh": "零售财年2002（2002-02-01 至 2003-01-31）门店净销售额同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "incomplete_period",
+      "sign_disagreement": false,
+      "metadata": {
+        "required_end": "2003-01-31",
+        "fixture_max_date": "2003-01-02",
+        "complete": false
+      }
+    },
+    {
+      "id": "msb_v0.1_cal_refuse_incomplete_cy2003",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "incomplete_calendar_year",
+      "gold_behavior": "refuse",
+      "question_en": "What were total store net sales for calendar year 2003 (January 1 to December 31 2003)?",
+      "question_zh": "2003自然年（1月1日–12月31日）门店净销售额合计是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "incomplete_period",
+      "sign_disagreement": false,
+      "metadata": {
+        "required_end": "2003-12-31",
+        "fixture_max_date": "2003-01-02",
+        "complete": false
+      }
+    },
+    {
+      "id": "msb_v0.1_life_clarify_newshare_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "clarify",
+      "question_en": "What share of store net sales in calendar year 2000 came from new products?",
+      "question_zh": "2000自然年新品销售占门店净销售额的比例是多少？",
+      "paired_definitions": [
+        {
+          "id": "first_sale_in_period",
+          "sql": "WITH first_sale AS (\n          SELECT i_item_id, MIN(d_date) AS first_d\n          FROM msb_store_sales GROUP BY 1\n        ),\n        new_ids AS (SELECT i_item_id FROM first_sale WHERE year(first_d) = 2000)\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2000",
+          "value": 0.0,
+          "unit": "ratio"
+        },
+        {
+          "id": "catalog_rec_start_in_period",
+          "sql": "WITH new_ids AS (\n          SELECT DISTINCT i_item_id FROM item\n          WHERE i_rec_start_date IS NOT NULL\n            AND year(i_rec_start_date) = 2000\n        )\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2000",
+          "value": 0.3327211093783013,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "gap": 0.3327211093783013
+      }
+    },
+    {
+      "id": "msb_v0.1_life_compute_firstsale_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "compute",
+      "question_en": "What share of store net sales in calendar year 2000 came from items whose first-ever store sale occurred in 2000?",
+      "question_zh": "2000年，首次门店销售发生在该年的商品，占当年门店净销售额的比例？",
+      "paired_definitions": [
+        {
+          "id": "first_sale_in_period",
+          "sql": "WITH first_sale AS (\n          SELECT i_item_id, MIN(d_date) AS first_d\n          FROM msb_store_sales GROUP BY 1\n        ),\n        new_ids AS (SELECT i_item_id FROM first_sale WHERE year(first_d) = 2000)\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2000",
+          "value": 0.0,
+          "unit": "ratio"
+        },
+        {
+          "id": "catalog_rec_start_in_period",
+          "sql": "WITH new_ids AS (\n          SELECT DISTINCT i_item_id FROM item\n          WHERE i_rec_start_date IS NOT NULL\n            AND year(i_rec_start_date) = 2000\n        )\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2000",
+          "value": 0.3327211093783013,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "first_sale_in_period",
+      "gold_sql": "WITH first_sale AS (\n          SELECT i_item_id, MIN(d_date) AS first_d\n          FROM msb_store_sales GROUP BY 1\n        ),\n        new_ids AS (SELECT i_item_id FROM first_sale WHERE year(first_d) = 2000)\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2000",
+      "gold_value": 0.0,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "gap": 0.3327211093783013
+      }
+    },
+    {
+      "id": "msb_v0.1_life_compute_recstart_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "compute",
+      "question_en": "What share of store net sales in calendar year 2000 came from items whose catalog record start date (i_rec_start_date) falls in 2000?",
+      "question_zh": "2000年，目录记录开始日期在该年的商品，占当年门店净销售额的比例？",
+      "paired_definitions": [
+        {
+          "id": "first_sale_in_period",
+          "sql": "WITH first_sale AS (\n          SELECT i_item_id, MIN(d_date) AS first_d\n          FROM msb_store_sales GROUP BY 1\n        ),\n        new_ids AS (SELECT i_item_id FROM first_sale WHERE year(first_d) = 2000)\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2000",
+          "value": 0.0,
+          "unit": "ratio"
+        },
+        {
+          "id": "catalog_rec_start_in_period",
+          "sql": "WITH new_ids AS (\n          SELECT DISTINCT i_item_id FROM item\n          WHERE i_rec_start_date IS NOT NULL\n            AND year(i_rec_start_date) = 2000\n        )\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2000",
+          "value": 0.3327211093783013,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "catalog_rec_start_in_period",
+      "gold_sql": "WITH new_ids AS (\n          SELECT DISTINCT i_item_id FROM item\n          WHERE i_rec_start_date IS NOT NULL\n            AND year(i_rec_start_date) = 2000\n        )\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2000",
+      "gold_value": 0.3327211093783013,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "gap": 0.3327211093783013
+      }
+    },
+    {
+      "id": "msb_v0.1_life_clarify_newshare_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "clarify",
+      "question_en": "What share of store net sales in calendar year 2001 came from new products?",
+      "question_zh": "2001自然年新品销售占门店净销售额的比例是多少？",
+      "paired_definitions": [
+        {
+          "id": "first_sale_in_period",
+          "sql": "WITH first_sale AS (\n          SELECT i_item_id, MIN(d_date) AS first_d\n          FROM msb_store_sales GROUP BY 1\n        ),\n        new_ids AS (SELECT i_item_id FROM first_sale WHERE year(first_d) = 2001)\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2001",
+          "value": 0.0,
+          "unit": "ratio"
+        },
+        {
+          "id": "catalog_rec_start_in_period",
+          "sql": "WITH new_ids AS (\n          SELECT DISTINCT i_item_id FROM item\n          WHERE i_rec_start_date IS NOT NULL\n            AND year(i_rec_start_date) = 2001\n        )\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2001",
+          "value": 0.33303649992050904,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "gap": 0.33303649992050904
+      }
+    },
+    {
+      "id": "msb_v0.1_life_compute_firstsale_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "compute",
+      "question_en": "What share of store net sales in calendar year 2001 came from items whose first-ever store sale occurred in 2001?",
+      "question_zh": "2001年，首次门店销售发生在该年的商品，占当年门店净销售额的比例？",
+      "paired_definitions": [
+        {
+          "id": "first_sale_in_period",
+          "sql": "WITH first_sale AS (\n          SELECT i_item_id, MIN(d_date) AS first_d\n          FROM msb_store_sales GROUP BY 1\n        ),\n        new_ids AS (SELECT i_item_id FROM first_sale WHERE year(first_d) = 2001)\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2001",
+          "value": 0.0,
+          "unit": "ratio"
+        },
+        {
+          "id": "catalog_rec_start_in_period",
+          "sql": "WITH new_ids AS (\n          SELECT DISTINCT i_item_id FROM item\n          WHERE i_rec_start_date IS NOT NULL\n            AND year(i_rec_start_date) = 2001\n        )\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2001",
+          "value": 0.33303649992050904,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "first_sale_in_period",
+      "gold_sql": "WITH first_sale AS (\n          SELECT i_item_id, MIN(d_date) AS first_d\n          FROM msb_store_sales GROUP BY 1\n        ),\n        new_ids AS (SELECT i_item_id FROM first_sale WHERE year(first_d) = 2001)\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2001",
+      "gold_value": 0.0,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "gap": 0.33303649992050904
+      }
+    },
+    {
+      "id": "msb_v0.1_life_compute_recstart_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "compute",
+      "question_en": "What share of store net sales in calendar year 2001 came from items whose catalog record start date (i_rec_start_date) falls in 2001?",
+      "question_zh": "2001年，目录记录开始日期在该年的商品，占当年门店净销售额的比例？",
+      "paired_definitions": [
+        {
+          "id": "first_sale_in_period",
+          "sql": "WITH first_sale AS (\n          SELECT i_item_id, MIN(d_date) AS first_d\n          FROM msb_store_sales GROUP BY 1\n        ),\n        new_ids AS (SELECT i_item_id FROM first_sale WHERE year(first_d) = 2001)\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2001",
+          "value": 0.0,
+          "unit": "ratio"
+        },
+        {
+          "id": "catalog_rec_start_in_period",
+          "sql": "WITH new_ids AS (\n          SELECT DISTINCT i_item_id FROM item\n          WHERE i_rec_start_date IS NOT NULL\n            AND year(i_rec_start_date) = 2001\n        )\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2001",
+          "value": 0.33303649992050904,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "catalog_rec_start_in_period",
+      "gold_sql": "WITH new_ids AS (\n          SELECT DISTINCT i_item_id FROM item\n          WHERE i_rec_start_date IS NOT NULL\n            AND year(i_rec_start_date) = 2001\n        )\n        SELECT\n          SUM(CASE WHEN n.i_item_id IS NOT NULL THEN ss.ss_net_paid ELSE 0 END) * 1.0\n          / NULLIF(SUM(ss.ss_net_paid), 0)\n        FROM msb_store_sales ss\n        LEFT JOIN new_ids n ON n.i_item_id = ss.i_item_id\n        WHERE ss.d_year = 2001",
+      "gold_value": 0.33303649992050904,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "gap": 0.33303649992050904
+      }
+    },
+    {
+      "id": "msb_v0.1_life_clarify_activerate_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "lifecycle",
+      "subtype": "active_item_rate_denominator",
+      "gold_behavior": "clarify",
+      "question_en": "What was the active-item rate of the catalog in calendar year 2001?",
+      "question_zh": "2001年的动销率是多少？",
+      "paired_definitions": [
+        {
+          "id": "denominator_in_catalog",
+          "sql": "WITH sold AS (\n      SELECT DISTINCT i_item_id FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    catalog AS (\n      SELECT DISTINCT i_item_id FROM item\n      WHERE i_rec_start_date IS NOT NULL AND i_rec_start_date <= DATE '2001-06-30'\n        AND (i_rec_end_date IS NULL OR i_rec_end_date >= DATE '2001-06-30')\n    )\n    SELECT (SELECT COUNT(*) FROM sold s JOIN catalog c ON s.i_item_id=c.i_item_id) * 1.0\n         / NULLIF((SELECT COUNT(*) FROM catalog), 0)",
+          "value": 1.0,
+          "unit": "ratio"
+        },
+        {
+          "id": "denominator_all_items",
+          "sql": "WITH sold AS (\n      SELECT DISTINCT i_item_id FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    all_items AS (SELECT DISTINCT i_item_id FROM item)\n    SELECT (SELECT COUNT(*) FROM sold) * 1.0 / NULLIF((SELECT COUNT(*) FROM all_items), 0)",
+          "value": 1.0,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "snapshot": "2001-06-30",
+        "gap": 0.0
+      }
+    },
+    {
+      "id": "msb_v0.1_life_compute_activerate_catalog_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "lifecycle",
+      "subtype": "active_item_rate_denominator",
+      "gold_behavior": "compute",
+      "question_en": "What fraction of items in-catalog on 2001-06-30 (i_rec_start_date <= snapshot and i_rec_end_date is null or >= snapshot) had at least one store sale in calendar year 2001?",
+      "question_zh": "以2001-06-30在档商品为分母，2001年至少有一笔门店销售的动销率是多少？",
+      "paired_definitions": [
+        {
+          "id": "denominator_in_catalog",
+          "sql": "WITH sold AS (\n      SELECT DISTINCT i_item_id FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    catalog AS (\n      SELECT DISTINCT i_item_id FROM item\n      WHERE i_rec_start_date IS NOT NULL AND i_rec_start_date <= DATE '2001-06-30'\n        AND (i_rec_end_date IS NULL OR i_rec_end_date >= DATE '2001-06-30')\n    )\n    SELECT (SELECT COUNT(*) FROM sold s JOIN catalog c ON s.i_item_id=c.i_item_id) * 1.0\n         / NULLIF((SELECT COUNT(*) FROM catalog), 0)",
+          "value": 1.0,
+          "unit": "ratio"
+        },
+        {
+          "id": "denominator_all_items",
+          "sql": "WITH sold AS (\n      SELECT DISTINCT i_item_id FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    all_items AS (SELECT DISTINCT i_item_id FROM item)\n    SELECT (SELECT COUNT(*) FROM sold) * 1.0 / NULLIF((SELECT COUNT(*) FROM all_items), 0)",
+          "value": 1.0,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "denominator_in_catalog",
+      "gold_sql": "WITH sold AS (\n      SELECT DISTINCT i_item_id FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    catalog AS (\n      SELECT DISTINCT i_item_id FROM item\n      WHERE i_rec_start_date IS NOT NULL AND i_rec_start_date <= DATE '2001-06-30'\n        AND (i_rec_end_date IS NULL OR i_rec_end_date >= DATE '2001-06-30')\n    )\n    SELECT (SELECT COUNT(*) FROM sold s JOIN catalog c ON s.i_item_id=c.i_item_id) * 1.0\n         / NULLIF((SELECT COUNT(*) FROM catalog), 0)",
+      "gold_value": 1.0,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "snapshot": "2001-06-30"
+      }
+    },
+    {
+      "id": "msb_v0.1_life_compute_activerate_all_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "lifecycle",
+      "subtype": "active_item_rate_denominator",
+      "gold_behavior": "compute",
+      "question_en": "What fraction of all item IDs in the item table had at least one store sale in calendar year 2001?",
+      "question_zh": "以商品表全部商品为分母，2001年至少有一笔门店销售的比例是多少？",
+      "paired_definitions": [
+        {
+          "id": "denominator_in_catalog",
+          "sql": "WITH sold AS (\n      SELECT DISTINCT i_item_id FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    catalog AS (\n      SELECT DISTINCT i_item_id FROM item\n      WHERE i_rec_start_date IS NOT NULL AND i_rec_start_date <= DATE '2001-06-30'\n        AND (i_rec_end_date IS NULL OR i_rec_end_date >= DATE '2001-06-30')\n    )\n    SELECT (SELECT COUNT(*) FROM sold s JOIN catalog c ON s.i_item_id=c.i_item_id) * 1.0\n         / NULLIF((SELECT COUNT(*) FROM catalog), 0)",
+          "value": 1.0,
+          "unit": "ratio"
+        },
+        {
+          "id": "denominator_all_items",
+          "sql": "WITH sold AS (\n      SELECT DISTINCT i_item_id FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    all_items AS (SELECT DISTINCT i_item_id FROM item)\n    SELECT (SELECT COUNT(*) FROM sold) * 1.0 / NULLIF((SELECT COUNT(*) FROM all_items), 0)",
+          "value": 1.0,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "denominator_all_items",
+      "gold_sql": "WITH sold AS (\n      SELECT DISTINCT i_item_id FROM msb_store_sales\n      WHERE d_date BETWEEN DATE '2001-01-01' AND DATE '2001-12-31'\n    ),\n    all_items AS (SELECT DISTINCT i_item_id FROM item)\n    SELECT (SELECT COUNT(*) FROM sold) * 1.0 / NULLIF((SELECT COUNT(*) FROM all_items), 0)",
+      "gold_value": 1.0,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001
+      }
+    },
+    {
+      "id": "msb_v0.1_ccy_clarify_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [
+        "metricsem_fx_v1"
+      ],
+      "type": "currency",
+      "subtype": "raw_vs_usd_converted",
+      "gold_behavior": "clarify",
+      "question_en": "What were total store net sales in calendar year 2000?",
+      "question_zh": "2000自然年门店净销售额合计是多少？",
+      "paired_definitions": [
+        {
+          "id": "raw_local_sum",
+          "sql": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2000",
+          "value": 923622685.27,
+          "unit": "mixed_currency_amount",
+          "note": "Illegal as a single-currency total; provided only to detect definition swap."
+        },
+        {
+          "id": "converted_usd_sum",
+          "sql": "SELECT SUM(net_paid_usd) FROM msb_store_sales WHERE d_year = 2000",
+          "value": 845468382.8851,
+          "unit": "usd",
+          "note": "Legal under metricsem_fx_v1: local amounts times frozen fx_to_usd."
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "raw": 923622685.27,
+        "usd": 845468382.8851,
+        "rel_gap": 0.09243905977678792
+      }
+    },
+    {
+      "id": "msb_v0.1_ccy_compute_usd_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [
+        "metricsem_fx_v1"
+      ],
+      "type": "currency",
+      "subtype": "raw_vs_usd_converted",
+      "gold_behavior": "compute",
+      "question_en": "What were total store net sales in calendar year 2000 in USD after converting each store's local currency with the frozen metricsem_fx_v1 rates?",
+      "question_zh": "按 metricsem_fx_v1 汇率折算为美元后，2000年门店净销售额合计是多少？",
+      "paired_definitions": [
+        {
+          "id": "raw_local_sum",
+          "sql": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2000",
+          "value": 923622685.27,
+          "unit": "mixed_currency_amount",
+          "note": "Illegal as a single-currency total; provided only to detect definition swap."
+        },
+        {
+          "id": "converted_usd_sum",
+          "sql": "SELECT SUM(net_paid_usd) FROM msb_store_sales WHERE d_year = 2000",
+          "value": 845468382.8851,
+          "unit": "usd",
+          "note": "Legal under metricsem_fx_v1: local amounts times frozen fx_to_usd."
+        }
+      ],
+      "specified_definition": "converted_usd_sum",
+      "gold_sql": "SELECT SUM(net_paid_usd) FROM msb_store_sales WHERE d_year = 2000",
+      "gold_value": 845468382.8851,
+      "gold_unit": "usd",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000
+      }
+    },
+    {
+      "id": "msb_v0.1_ccy_refuse_raw_as_usd_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [
+        "metricsem_fx_v1"
+      ],
+      "type": "currency",
+      "subtype": "raw_sum_claimed_as_usd",
+      "gold_behavior": "refuse",
+      "question_en": "Report a single USD total of store net sales for calendar year 2000 by summing ss_net_paid across all stores without conversion (treat every local amount as if it were already USD).",
+      "question_zh": "把各店本地币种的 ss_net_paid 直接相加，作为2000年以美元计的门店净销售总额。",
+      "paired_definitions": [
+        {
+          "id": "raw_local_sum",
+          "sql": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2000",
+          "value": 923622685.27,
+          "unit": "mixed_currency_amount",
+          "note": "Illegal as a single-currency total; provided only to detect definition swap."
+        },
+        {
+          "id": "converted_usd_sum",
+          "sql": "SELECT SUM(net_paid_usd) FROM msb_store_sales WHERE d_year = 2000",
+          "value": 845468382.8851,
+          "unit": "usd",
+          "note": "Legal under metricsem_fx_v1: local amounts times frozen fx_to_usd."
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "currency_mix_no_fx",
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "illegal_value_if_executed": 923622685.27
+      }
+    },
+    {
+      "id": "msb_v0.1_ccy_clarify_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [
+        "metricsem_fx_v1"
+      ],
+      "type": "currency",
+      "subtype": "raw_vs_usd_converted",
+      "gold_behavior": "clarify",
+      "question_en": "What were total store net sales in calendar year 2001?",
+      "question_zh": "2001自然年门店净销售额合计是多少？",
+      "paired_definitions": [
+        {
+          "id": "raw_local_sum",
+          "sql": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001",
+          "value": 906405394.55,
+          "unit": "mixed_currency_amount",
+          "note": "Illegal as a single-currency total; provided only to detect definition swap."
+        },
+        {
+          "id": "converted_usd_sum",
+          "sql": "SELECT SUM(net_paid_usd) FROM msb_store_sales WHERE d_year = 2001",
+          "value": 828341142.6349,
+          "unit": "usd",
+          "note": "Legal under metricsem_fx_v1: local amounts times frozen fx_to_usd."
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "raw": 906405394.55,
+        "usd": 828341142.6349,
+        "rel_gap": 0.09424166915913727
+      }
+    },
+    {
+      "id": "msb_v0.1_ccy_compute_usd_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [
+        "metricsem_fx_v1"
+      ],
+      "type": "currency",
+      "subtype": "raw_vs_usd_converted",
+      "gold_behavior": "compute",
+      "question_en": "What were total store net sales in calendar year 2001 in USD after converting each store's local currency with the frozen metricsem_fx_v1 rates?",
+      "question_zh": "按 metricsem_fx_v1 汇率折算为美元后，2001年门店净销售额合计是多少？",
+      "paired_definitions": [
+        {
+          "id": "raw_local_sum",
+          "sql": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001",
+          "value": 906405394.55,
+          "unit": "mixed_currency_amount",
+          "note": "Illegal as a single-currency total; provided only to detect definition swap."
+        },
+        {
+          "id": "converted_usd_sum",
+          "sql": "SELECT SUM(net_paid_usd) FROM msb_store_sales WHERE d_year = 2001",
+          "value": 828341142.6349,
+          "unit": "usd",
+          "note": "Legal under metricsem_fx_v1: local amounts times frozen fx_to_usd."
+        }
+      ],
+      "specified_definition": "converted_usd_sum",
+      "gold_sql": "SELECT SUM(net_paid_usd) FROM msb_store_sales WHERE d_year = 2001",
+      "gold_value": 828341142.6349,
+      "gold_unit": "usd",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001
+      }
+    },
+    {
+      "id": "msb_v0.1_ccy_refuse_raw_as_usd_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [
+        "metricsem_fx_v1"
+      ],
+      "type": "currency",
+      "subtype": "raw_sum_claimed_as_usd",
+      "gold_behavior": "refuse",
+      "question_en": "Report a single USD total of store net sales for calendar year 2001 by summing ss_net_paid across all stores without conversion (treat every local amount as if it were already USD).",
+      "question_zh": "把各店本地币种的 ss_net_paid 直接相加，作为2001年以美元计的门店净销售总额。",
+      "paired_definitions": [
+        {
+          "id": "raw_local_sum",
+          "sql": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001",
+          "value": 906405394.55,
+          "unit": "mixed_currency_amount",
+          "note": "Illegal as a single-currency total; provided only to detect definition swap."
+        },
+        {
+          "id": "converted_usd_sum",
+          "sql": "SELECT SUM(net_paid_usd) FROM msb_store_sales WHERE d_year = 2001",
+          "value": 828341142.6349,
+          "unit": "usd",
+          "note": "Legal under metricsem_fx_v1: local amounts times frozen fx_to_usd."
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "currency_mix_no_fx",
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "illegal_value_if_executed": 906405394.55
+      }
+    },
+    {
+      "id": "msb_v0.1_nadd_compute_overall_aov_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "non_additive",
+      "subtype": "aov",
+      "gold_behavior": "compute",
+      "question_en": "What was the overall average order value of store sales in calendar year 2000, defined as total ss_net_paid divided by the number of distinct tickets?",
+      "question_zh": "2000自然年门店总体客单价（净销售额 / 去重小票数）是多少？",
+      "paired_definitions": [
+        {
+          "id": "overall_aov",
+          "sql": "SELECT SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0)\n        FROM msb_store_sales WHERE d_year = 2000",
+          "value": 19123.018805151245,
+          "unit": "amount_per_ticket"
+        },
+        {
+          "id": "sum_of_store_aovs",
+          "sql": "SELECT SUM(aov) FROM (\n          SELECT ss_store_sk,\n                 SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0) AS aov\n          FROM msb_store_sales WHERE d_year = 2000\n          GROUP BY ss_store_sk\n        )",
+          "value": 114739.94240252013,
+          "unit": "illegal_sum_of_rates"
+        }
+      ],
+      "specified_definition": "overall_aov",
+      "gold_sql": "SELECT SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0)\n        FROM msb_store_sales WHERE d_year = 2000",
+      "gold_value": 19123.018805151245,
+      "gold_unit": "amount_per_ticket",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000
+      }
+    },
+    {
+      "id": "msb_v0.1_nadd_refuse_sum_store_aov_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "non_additive",
+      "subtype": "aov_illegal_sum",
+      "gold_behavior": "refuse",
+      "question_en": "Report the total average order value for calendar year 2000 by summing the per-store average order values.",
+      "question_zh": "把各门店2000年客单价相加，作为该年总客单价。",
+      "paired_definitions": [
+        {
+          "id": "overall_aov",
+          "sql": "SELECT SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0)\n        FROM msb_store_sales WHERE d_year = 2000",
+          "value": 19123.018805151245,
+          "unit": "amount_per_ticket"
+        },
+        {
+          "id": "sum_of_store_aovs",
+          "sql": "SELECT SUM(aov) FROM (\n          SELECT ss_store_sk,\n                 SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0) AS aov\n          FROM msb_store_sales WHERE d_year = 2000\n          GROUP BY ss_store_sk\n        )",
+          "value": 114739.94240252013,
+          "unit": "illegal_sum_of_rates"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "non_additive_sum",
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "illegal_value_if_executed": 114739.94240252013,
+        "overall_aov": 19123.018805151245
+      }
+    },
+    {
+      "id": "msb_v0.1_nadd_compute_margin_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "non_additive",
+      "subtype": "margin_rate",
+      "gold_behavior": "compute",
+      "question_en": "What was the overall net-profit margin rate of store sales in calendar year 2000, defined as SUM(ss_net_profit) / SUM(ss_net_paid)?",
+      "question_zh": "2000年门店总体净利润率（SUM(ss_net_profit)/SUM(ss_net_paid)）是多少？",
+      "paired_definitions": [
+        {
+          "id": "overall_margin_rate",
+          "sql": "SELECT SUM(ss_net_profit) * 1.0 / NULLIF(SUM(ss_net_paid), 0)\n        FROM msb_store_sales WHERE d_year = 2000",
+          "value": -0.47745266573989337,
+          "unit": "ratio"
+        },
+        {
+          "id": "sum_of_store_margin_rates",
+          "sql": "SELECT SUM(m) FROM (\n          SELECT ss_store_sk, SUM(ss_net_profit) * 1.0 / NULLIF(SUM(ss_net_paid), 0) AS m\n          FROM msb_store_sales WHERE d_year = 2000 GROUP BY ss_store_sk\n        )",
+          "value": -2.8647226737867526,
+          "unit": "illegal_sum_of_rates"
+        }
+      ],
+      "specified_definition": "overall_margin_rate",
+      "gold_sql": "SELECT SUM(ss_net_profit) * 1.0 / NULLIF(SUM(ss_net_paid), 0)\n        FROM msb_store_sales WHERE d_year = 2000",
+      "gold_value": -0.47745266573989337,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000
+      }
+    },
+    {
+      "id": "msb_v0.1_nadd_refuse_sum_margin_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "non_additive",
+      "subtype": "margin_rate_illegal_sum",
+      "gold_behavior": "refuse",
+      "question_en": "Report the total net-profit margin rate for calendar year 2000 by summing the per-store margin rates.",
+      "question_zh": "把各门店2000年净利润率相加，作为该年总利润率。",
+      "paired_definitions": [
+        {
+          "id": "overall_margin_rate",
+          "sql": "SELECT SUM(ss_net_profit) * 1.0 / NULLIF(SUM(ss_net_paid), 0)\n        FROM msb_store_sales WHERE d_year = 2000",
+          "value": -0.47745266573989337,
+          "unit": "ratio"
+        },
+        {
+          "id": "sum_of_store_margin_rates",
+          "sql": "SELECT SUM(m) FROM (\n          SELECT ss_store_sk, SUM(ss_net_profit) * 1.0 / NULLIF(SUM(ss_net_paid), 0) AS m\n          FROM msb_store_sales WHERE d_year = 2000 GROUP BY ss_store_sk\n        )",
+          "value": -2.8647226737867526,
+          "unit": "illegal_sum_of_rates"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "non_additive_sum",
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "illegal_value_if_executed": -2.8647226737867526,
+        "overall": -0.47745266573989337
+      }
+    },
+    {
+      "id": "msb_v0.1_nadd_compute_overall_aov_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "non_additive",
+      "subtype": "aov",
+      "gold_behavior": "compute",
+      "question_en": "What was the overall average order value of store sales in calendar year 2001, defined as total ss_net_paid divided by the number of distinct tickets?",
+      "question_zh": "2001自然年门店总体客单价（净销售额 / 去重小票数）是多少？",
+      "paired_definitions": [
+        {
+          "id": "overall_aov",
+          "sql": "SELECT SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0)\n        FROM msb_store_sales WHERE d_year = 2001",
+          "value": 19002.209529350104,
+          "unit": "amount_per_ticket"
+        },
+        {
+          "id": "sum_of_store_aovs",
+          "sql": "SELECT SUM(aov) FROM (\n          SELECT ss_store_sk,\n                 SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0) AS aov\n          FROM msb_store_sales WHERE d_year = 2001\n          GROUP BY ss_store_sk\n        )",
+          "value": 114014.58622109328,
+          "unit": "illegal_sum_of_rates"
+        }
+      ],
+      "specified_definition": "overall_aov",
+      "gold_sql": "SELECT SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0)\n        FROM msb_store_sales WHERE d_year = 2001",
+      "gold_value": 19002.209529350104,
+      "gold_unit": "amount_per_ticket",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001
+      }
+    },
+    {
+      "id": "msb_v0.1_nadd_refuse_sum_store_aov_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "non_additive",
+      "subtype": "aov_illegal_sum",
+      "gold_behavior": "refuse",
+      "question_en": "Report the total average order value for calendar year 2001 by summing the per-store average order values.",
+      "question_zh": "把各门店2001年客单价相加，作为该年总客单价。",
+      "paired_definitions": [
+        {
+          "id": "overall_aov",
+          "sql": "SELECT SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0)\n        FROM msb_store_sales WHERE d_year = 2001",
+          "value": 19002.209529350104,
+          "unit": "amount_per_ticket"
+        },
+        {
+          "id": "sum_of_store_aovs",
+          "sql": "SELECT SUM(aov) FROM (\n          SELECT ss_store_sk,\n                 SUM(ss_net_paid) * 1.0 / NULLIF(COUNT(DISTINCT ss_ticket_number), 0) AS aov\n          FROM msb_store_sales WHERE d_year = 2001\n          GROUP BY ss_store_sk\n        )",
+          "value": 114014.58622109328,
+          "unit": "illegal_sum_of_rates"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "non_additive_sum",
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "illegal_value_if_executed": 114014.58622109328,
+        "overall_aov": 19002.209529350104
+      }
+    },
+    {
+      "id": "msb_v0.1_nadd_compute_margin_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "non_additive",
+      "subtype": "margin_rate",
+      "gold_behavior": "compute",
+      "question_en": "What was the overall net-profit margin rate of store sales in calendar year 2001, defined as SUM(ss_net_profit) / SUM(ss_net_paid)?",
+      "question_zh": "2001年门店总体净利润率（SUM(ss_net_profit)/SUM(ss_net_paid)）是多少？",
+      "paired_definitions": [
+        {
+          "id": "overall_margin_rate",
+          "sql": "SELECT SUM(ss_net_profit) * 1.0 / NULLIF(SUM(ss_net_paid), 0)\n        FROM msb_store_sales WHERE d_year = 2001",
+          "value": -0.48320955931362736,
+          "unit": "ratio"
+        },
+        {
+          "id": "sum_of_store_margin_rates",
+          "sql": "SELECT SUM(m) FROM (\n          SELECT ss_store_sk, SUM(ss_net_profit) * 1.0 / NULLIF(SUM(ss_net_paid), 0) AS m\n          FROM msb_store_sales WHERE d_year = 2001 GROUP BY ss_store_sk\n        )",
+          "value": -2.8992072762549075,
+          "unit": "illegal_sum_of_rates"
+        }
+      ],
+      "specified_definition": "overall_margin_rate",
+      "gold_sql": "SELECT SUM(ss_net_profit) * 1.0 / NULLIF(SUM(ss_net_paid), 0)\n        FROM msb_store_sales WHERE d_year = 2001",
+      "gold_value": -0.48320955931362736,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001
+      }
+    },
+    {
+      "id": "msb_v0.1_nadd_refuse_sum_margin_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "non_additive",
+      "subtype": "margin_rate_illegal_sum",
+      "gold_behavior": "refuse",
+      "question_en": "Report the total net-profit margin rate for calendar year 2001 by summing the per-store margin rates.",
+      "question_zh": "把各门店2001年净利润率相加，作为该年总利润率。",
+      "paired_definitions": [
+        {
+          "id": "overall_margin_rate",
+          "sql": "SELECT SUM(ss_net_profit) * 1.0 / NULLIF(SUM(ss_net_paid), 0)\n        FROM msb_store_sales WHERE d_year = 2001",
+          "value": -0.48320955931362736,
+          "unit": "ratio"
+        },
+        {
+          "id": "sum_of_store_margin_rates",
+          "sql": "SELECT SUM(m) FROM (\n          SELECT ss_store_sk, SUM(ss_net_profit) * 1.0 / NULLIF(SUM(ss_net_paid), 0) AS m\n          FROM msb_store_sales WHERE d_year = 2001 GROUP BY ss_store_sk\n        )",
+          "value": -2.8992072762549075,
+          "unit": "illegal_sum_of_rates"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "non_additive_sum",
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "illegal_value_if_executed": -2.8992072762549075,
+        "overall": -0.48320955931362736
+      }
+    },
+    {
+      "id": "msb_v0.1_den_clarify_return_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "clarify",
+      "question_en": "What was the store return rate in calendar year 2000?",
+      "question_zh": "2000年门店退货率是多少？",
+      "paired_definitions": [
+        {
+          "id": "return_rate_amount",
+          "sql": "SELECT (SELECT SUM(sr_return_amt) FROM msb_store_returns WHERE d_year = 2000) * 1.0\n             / NULLIF((SELECT SUM(ss_ext_sales_price) FROM msb_store_sales WHERE d_year = 2000), 0)",
+          "value": 0.05181382990273888,
+          "unit": "ratio"
+        },
+        {
+          "id": "return_rate_quantity",
+          "sql": "SELECT (SELECT SUM(sr_return_quantity) FROM msb_store_returns WHERE d_year = 2000) * 1.0\n             / NULLIF((SELECT SUM(ss_quantity) FROM msb_store_sales WHERE d_year = 2000), 0)",
+          "value": 0.0519124135484299,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000,
+        "gap": 9.85836456910208e-05
+      }
+    },
+    {
+      "id": "msb_v0.1_den_compute_return_amt_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "compute",
+      "question_en": "What was the store return rate in calendar year 2000, defined as SUM(sr_return_amt) / SUM(ss_ext_sales_price)?",
+      "question_zh": "2000年按金额计的退货率（退货金额/销售金额）是多少？",
+      "paired_definitions": [
+        {
+          "id": "return_rate_amount",
+          "sql": "SELECT (SELECT SUM(sr_return_amt) FROM msb_store_returns WHERE d_year = 2000) * 1.0\n             / NULLIF((SELECT SUM(ss_ext_sales_price) FROM msb_store_sales WHERE d_year = 2000), 0)",
+          "value": 0.05181382990273888,
+          "unit": "ratio"
+        },
+        {
+          "id": "return_rate_quantity",
+          "sql": "SELECT (SELECT SUM(sr_return_quantity) FROM msb_store_returns WHERE d_year = 2000) * 1.0\n             / NULLIF((SELECT SUM(ss_quantity) FROM msb_store_sales WHERE d_year = 2000), 0)",
+          "value": 0.0519124135484299,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "return_rate_amount",
+      "gold_sql": "SELECT (SELECT SUM(sr_return_amt) FROM msb_store_returns WHERE d_year = 2000) * 1.0\n             / NULLIF((SELECT SUM(ss_ext_sales_price) FROM msb_store_sales WHERE d_year = 2000), 0)",
+      "gold_value": 0.05181382990273888,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000
+      }
+    },
+    {
+      "id": "msb_v0.1_den_compute_return_qty_2000",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "compute",
+      "question_en": "What was the store return rate in calendar year 2000, defined as SUM(sr_return_quantity) / SUM(ss_quantity)?",
+      "question_zh": "2000年按件数计的退货率（退货件数/销售件数）是多少？",
+      "paired_definitions": [
+        {
+          "id": "return_rate_amount",
+          "sql": "SELECT (SELECT SUM(sr_return_amt) FROM msb_store_returns WHERE d_year = 2000) * 1.0\n             / NULLIF((SELECT SUM(ss_ext_sales_price) FROM msb_store_sales WHERE d_year = 2000), 0)",
+          "value": 0.05181382990273888,
+          "unit": "ratio"
+        },
+        {
+          "id": "return_rate_quantity",
+          "sql": "SELECT (SELECT SUM(sr_return_quantity) FROM msb_store_returns WHERE d_year = 2000) * 1.0\n             / NULLIF((SELECT SUM(ss_quantity) FROM msb_store_sales WHERE d_year = 2000), 0)",
+          "value": 0.0519124135484299,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "return_rate_quantity",
+      "gold_sql": "SELECT (SELECT SUM(sr_return_quantity) FROM msb_store_returns WHERE d_year = 2000) * 1.0\n             / NULLIF((SELECT SUM(ss_quantity) FROM msb_store_sales WHERE d_year = 2000), 0)",
+      "gold_value": 0.0519124135484299,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2000
+      }
+    },
+    {
+      "id": "msb_v0.1_den_clarify_return_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "clarify",
+      "question_en": "What was the store return rate in calendar year 2001?",
+      "question_zh": "2001年门店退货率是多少？",
+      "paired_definitions": [
+        {
+          "id": "return_rate_amount",
+          "sql": "SELECT (SELECT SUM(sr_return_amt) FROM msb_store_returns WHERE d_year = 2001) * 1.0\n             / NULLIF((SELECT SUM(ss_ext_sales_price) FROM msb_store_sales WHERE d_year = 2001), 0)",
+          "value": 0.05263092695411126,
+          "unit": "ratio"
+        },
+        {
+          "id": "return_rate_quantity",
+          "sql": "SELECT (SELECT SUM(sr_return_quantity) FROM msb_store_returns WHERE d_year = 2001) * 1.0\n             / NULLIF((SELECT SUM(ss_quantity) FROM msb_store_sales WHERE d_year = 2001), 0)",
+          "value": 0.05285926440290613,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "gap": 0.0002283374487948714
+      }
+    },
+    {
+      "id": "msb_v0.1_den_compute_return_amt_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "compute",
+      "question_en": "What was the store return rate in calendar year 2001, defined as SUM(sr_return_amt) / SUM(ss_ext_sales_price)?",
+      "question_zh": "2001年按金额计的退货率（退货金额/销售金额）是多少？",
+      "paired_definitions": [
+        {
+          "id": "return_rate_amount",
+          "sql": "SELECT (SELECT SUM(sr_return_amt) FROM msb_store_returns WHERE d_year = 2001) * 1.0\n             / NULLIF((SELECT SUM(ss_ext_sales_price) FROM msb_store_sales WHERE d_year = 2001), 0)",
+          "value": 0.05263092695411126,
+          "unit": "ratio"
+        },
+        {
+          "id": "return_rate_quantity",
+          "sql": "SELECT (SELECT SUM(sr_return_quantity) FROM msb_store_returns WHERE d_year = 2001) * 1.0\n             / NULLIF((SELECT SUM(ss_quantity) FROM msb_store_sales WHERE d_year = 2001), 0)",
+          "value": 0.05285926440290613,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "return_rate_amount",
+      "gold_sql": "SELECT (SELECT SUM(sr_return_amt) FROM msb_store_returns WHERE d_year = 2001) * 1.0\n             / NULLIF((SELECT SUM(ss_ext_sales_price) FROM msb_store_sales WHERE d_year = 2001), 0)",
+      "gold_value": 0.05263092695411126,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001
+      }
+    },
+    {
+      "id": "msb_v0.1_den_compute_return_qty_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "compute",
+      "question_en": "What was the store return rate in calendar year 2001, defined as SUM(sr_return_quantity) / SUM(ss_quantity)?",
+      "question_zh": "2001年按件数计的退货率（退货件数/销售件数）是多少？",
+      "paired_definitions": [
+        {
+          "id": "return_rate_amount",
+          "sql": "SELECT (SELECT SUM(sr_return_amt) FROM msb_store_returns WHERE d_year = 2001) * 1.0\n             / NULLIF((SELECT SUM(ss_ext_sales_price) FROM msb_store_sales WHERE d_year = 2001), 0)",
+          "value": 0.05263092695411126,
+          "unit": "ratio"
+        },
+        {
+          "id": "return_rate_quantity",
+          "sql": "SELECT (SELECT SUM(sr_return_quantity) FROM msb_store_returns WHERE d_year = 2001) * 1.0\n             / NULLIF((SELECT SUM(ss_quantity) FROM msb_store_sales WHERE d_year = 2001), 0)",
+          "value": 0.05285926440290613,
+          "unit": "ratio"
+        }
+      ],
+      "specified_definition": "return_rate_quantity",
+      "gold_sql": "SELECT (SELECT SUM(sr_return_quantity) FROM msb_store_returns WHERE d_year = 2001) * 1.0\n             / NULLIF((SELECT SUM(ss_quantity) FROM msb_store_sales WHERE d_year = 2001), 0)",
+      "gold_value": 0.05285926440290613,
+      "gold_unit": "ratio",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001
+      }
+    },
+    {
+      "id": "msb_v0.1_den_clarify_channel_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "denominator",
+      "subtype": "channel_scope",
+      "gold_behavior": "clarify",
+      "question_en": "What were total net sales in calendar year 2001?",
+      "question_zh": "2001年净销售总额是多少？",
+      "paired_definitions": [
+        {
+          "id": "store_channel_only",
+          "sql": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001",
+          "value": 906405394.55,
+          "unit": "amount"
+        },
+        {
+          "id": "store_web_catalog",
+          "sql": "SELECT\n      (SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001)\n    + (SELECT SUM(ws_net_paid) FROM msb_web_sales WHERE d_year = 2001)\n    + (SELECT SUM(cs_net_paid) FROM msb_catalog_sales WHERE d_year = 2001)",
+          "value": 1896334498.98,
+          "unit": "amount"
+        }
+      ],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001,
+        "rel_gap": 1.092148293006869
+      }
+    },
+    {
+      "id": "msb_v0.1_den_compute_store_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "denominator",
+      "subtype": "channel_scope",
+      "gold_behavior": "compute",
+      "question_en": "What were total store-channel net sales (store_sales only) in calendar year 2001?",
+      "question_zh": "2001年仅门店渠道（store_sales）净销售额是多少？",
+      "paired_definitions": [
+        {
+          "id": "store_channel_only",
+          "sql": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001",
+          "value": 906405394.55,
+          "unit": "amount"
+        },
+        {
+          "id": "store_web_catalog",
+          "sql": "SELECT\n      (SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001)\n    + (SELECT SUM(ws_net_paid) FROM msb_web_sales WHERE d_year = 2001)\n    + (SELECT SUM(cs_net_paid) FROM msb_catalog_sales WHERE d_year = 2001)",
+          "value": 1896334498.98,
+          "unit": "amount"
+        }
+      ],
+      "specified_definition": "store_channel_only",
+      "gold_sql": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001",
+      "gold_value": 906405394.55,
+      "gold_unit": "amount",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001
+      }
+    },
+    {
+      "id": "msb_v0.1_den_compute_allch_2001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "denominator",
+      "subtype": "channel_scope",
+      "gold_behavior": "compute",
+      "question_en": "What were total net sales across store, web, and catalog channels (SUM ss_net_paid + ws_net_paid + cs_net_paid) in calendar year 2001?",
+      "question_zh": "2001年门店+网站+目录三渠道净销售额合计是多少？",
+      "paired_definitions": [
+        {
+          "id": "store_channel_only",
+          "sql": "SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001",
+          "value": 906405394.55,
+          "unit": "amount"
+        },
+        {
+          "id": "store_web_catalog",
+          "sql": "SELECT\n      (SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001)\n    + (SELECT SUM(ws_net_paid) FROM msb_web_sales WHERE d_year = 2001)\n    + (SELECT SUM(cs_net_paid) FROM msb_catalog_sales WHERE d_year = 2001)",
+          "value": 1896334498.98,
+          "unit": "amount"
+        }
+      ],
+      "specified_definition": "store_web_catalog",
+      "gold_sql": "SELECT\n      (SELECT SUM(ss_net_paid) FROM msb_store_sales WHERE d_year = 2001)\n    + (SELECT SUM(ws_net_paid) FROM msb_web_sales WHERE d_year = 2001)\n    + (SELECT SUM(cs_net_paid) FROM msb_catalog_sales WHERE d_year = 2001)",
+      "gold_value": 1896334498.98,
+      "gold_unit": "amount",
+      "refuse_reason": null,
+      "sign_disagreement": false,
+      "metadata": {
+        "yr": 2001
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAJCMCAAAA in calendar month October 2001 (versus October 2000)?",
+      "question_zh": "商品 AAAAAAAAJCMCAAAA 在 2001年10月相对 2000年10月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "undefined_yoy",
+      "sign_disagreement": false,
+      "metadata": {
+        "item_id": "AAAAAAAAJCMCAAAA",
+        "category": "Men",
+        "cur_tickets": 11,
+        "prev_tickets": 0,
+        "cur_amt": 18629.38,
+        "prev_amt": 0.0,
+        "sparse_min_prior_tickets": 5
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_002",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAFBGEAAAA in calendar month October 2001 (versus October 2000)?",
+      "question_zh": "商品 AAAAAAAAFBGEAAAA 在 2001年10月相对 2000年10月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "sparse_prior",
+      "sign_disagreement": false,
+      "metadata": {
+        "item_id": "AAAAAAAAFBGEAAAA",
+        "category": "Shoes",
+        "cur_tickets": 12,
+        "prev_tickets": 1,
+        "cur_amt": 16794.91,
+        "prev_amt": 2624.04,
+        "sparse_min_prior_tickets": 5
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_003",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAIEEDAAAA in calendar month October 2001 (versus October 2000)?",
+      "question_zh": "商品 AAAAAAAAIEEDAAAA 在 2001年10月相对 2000年10月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "sparse_prior",
+      "sign_disagreement": false,
+      "metadata": {
+        "item_id": "AAAAAAAAIEEDAAAA",
+        "category": "Electronics",
+        "cur_tickets": 12,
+        "prev_tickets": 1,
+        "cur_amt": 13956.35,
+        "prev_amt": 2121.16,
+        "sparse_min_prior_tickets": 5
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_004",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAACLOCAAAA in calendar month October 2001 (versus October 2000)?",
+      "question_zh": "商品 AAAAAAAACLOCAAAA 在 2001年10月相对 2000年10月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "sparse_prior",
+      "sign_disagreement": false,
+      "metadata": {
+        "item_id": "AAAAAAAACLOCAAAA",
+        "category": "Electronics",
+        "cur_tickets": 11,
+        "prev_tickets": 1,
+        "cur_amt": 9592.74,
+        "prev_amt": 10945.62,
+        "sparse_min_prior_tickets": 5
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_005",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAEFFAAAAA in calendar month October 2001 (versus October 2000)?",
+      "question_zh": "商品 AAAAAAAAEFFAAAAA 在 2001年10月相对 2000年10月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "sparse_prior",
+      "sign_disagreement": false,
+      "metadata": {
+        "item_id": "AAAAAAAAEFFAAAAA",
+        "category": "Books",
+        "cur_tickets": 11,
+        "prev_tickets": 1,
+        "cur_amt": 26945.15,
+        "prev_amt": 0.0,
+        "sparse_min_prior_tickets": 5
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_006",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAFEBAAAAA in calendar month October 2001 (versus October 2000)?",
+      "question_zh": "商品 AAAAAAAAFEBAAAAA 在 2001年10月相对 2000年10月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "sparse_prior",
+      "sign_disagreement": false,
+      "metadata": {
+        "item_id": "AAAAAAAAFEBAAAAA",
+        "category": "Men",
+        "cur_tickets": 11,
+        "prev_tickets": 1,
+        "cur_amt": 18173.87,
+        "prev_amt": 94.78,
+        "sparse_min_prior_tickets": 5
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_007",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAGLPAAAAA in calendar month October 2001 (versus October 2000)?",
+      "question_zh": "商品 AAAAAAAAGLPAAAAA 在 2001年10月相对 2000年10月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "sparse_prior",
+      "sign_disagreement": false,
+      "metadata": {
+        "item_id": "AAAAAAAAGLPAAAAA",
+        "category": "Home",
+        "cur_tickets": 11,
+        "prev_tickets": 1,
+        "cur_amt": 6812.82,
+        "prev_amt": 1839.75,
+        "sparse_min_prior_tickets": 5
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_008",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAHHIAAAAA in calendar month October 2001 (versus October 2000)?",
+      "question_zh": "商品 AAAAAAAAHHIAAAAA 在 2001年10月相对 2000年10月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "sparse_prior",
+      "sign_disagreement": false,
+      "metadata": {
+        "item_id": "AAAAAAAAHHIAAAAA",
+        "category": "Books",
+        "cur_tickets": 11,
+        "prev_tickets": 1,
+        "cur_amt": 28016.22,
+        "prev_amt": 39.35,
+        "sparse_min_prior_tickets": 5
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_brand_001",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "brand_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for brand 'exportimaxi #4' in the Books category for calendar month February 2001?",
+      "question_zh": "Books 类目下品牌 exportimaxi #4 在 2001年2月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "undefined_yoy",
+      "sign_disagreement": false,
+      "metadata": {
+        "brand": "exportimaxi #4",
+        "category": "Books",
+        "cur_tickets": 42,
+        "prev_tickets": 0,
+        "cur_amt": 78436.77,
+        "prev_amt": 0.0
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_brand_002",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "brand_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for brand 'corpmaxi #10' in the Books category for calendar month February 2001?",
+      "question_zh": "Books 类目下品牌 corpmaxi #10 在 2001年2月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "undefined_yoy",
+      "sign_disagreement": false,
+      "metadata": {
+        "brand": "corpmaxi #10",
+        "category": "Books",
+        "cur_tickets": 32,
+        "prev_tickets": 0,
+        "cur_amt": 55930.21,
+        "prev_amt": 0.0
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_brand_003",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "brand_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for brand 'edu packunivamalg #4' in the Books category for calendar month February 2001?",
+      "question_zh": "Books 类目下品牌 edu packunivamalg #4 在 2001年2月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "undefined_yoy",
+      "sign_disagreement": false,
+      "metadata": {
+        "brand": "edu packunivamalg #4",
+        "category": "Books",
+        "cur_tickets": 32,
+        "prev_tickets": 0,
+        "cur_amt": 75780.14,
+        "prev_amt": 0.0
+      }
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_brand_004",
+      "version": "v0.1",
+      "source": "tpcds_sf1_dsdgen_official",
+      "extensions": [],
+      "type": "sparse_completeness",
+      "subtype": "brand_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "question_en": "What was the year-over-year growth rate of store net sales for brand 'scholarunivamalg #10' in the Books category for calendar month February 2001?",
+      "question_zh": "Books 类目下品牌 scholarunivamalg #10 在 2001年2月的门店净销售同比是多少？",
+      "paired_definitions": [],
+      "specified_definition": null,
+      "gold_sql": null,
+      "gold_value": null,
+      "gold_unit": null,
+      "refuse_reason": "undefined_yoy",
+      "sign_disagreement": false,
+      "metadata": {
+        "brand": "scholarunivamalg #10",
+        "category": "Books",
+        "cur_tickets": 32,
+        "prev_tickets": 0,
+        "cur_amt": 58514.07,
+        "prev_amt": 0.0
+      }
+    }
+  ]
+}

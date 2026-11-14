@@ -1,0 +1,66 @@
+{
+ "tokens1688_2_claude-opus-5_semantic_max": {
+  "calendar": 33.333333333333336,
+  "currency": 100.0,
+  "non_additive": 100.0,
+  "denominator": 66.66666666666667,
+  "lifecycle": 45.833333333333336,
+  "sparse_completeness": 87.5
+ },
+ "tokens1688_2_claude-opus-5-5_semantic_high": {
+  "calendar": 18.88888888888889,
+  "currency": 100.0,
+  "non_additive": 100.0,
+  "denominator": 83.33333333333333,
+  "lifecycle": 83.33333333333333,
+  "sparse_completeness": 75.0
+ },
+ "tokens1688_gpt-6-sol_semantic": {
+  "calendar": 33.333333333333336,
+  "currency": 100.0,
+  "non_additive": 100.0,
+  "denominator": 83.33333333333333,
+  "lifecycle": 33.333333333333336,
+  "sparse_completeness": 28.125
+ },
+ "ark_deepseek-v4-pro_semantic": {
+  "calendar": 55.55555555555556,
+  "currency": 66.66666666666667,
+  "non_additive": 100.0,
+  "denominator": 33.333333333333336,
+  "lifecycle": 50.0,
+  "sparse_completeness": 25.0
+ },
+ "tokens1688_claude-sonnet-4-6_semantic": {
+  "calendar": 32.22222222222222,
+  "currency": 95.83333333333333,
+  "non_additive": 100.0,
+  "denominator": 33.333333333333336,
+  "lifecycle": 54.166666666666664,
+  "sparse_completeness": 43.75
+ },
+ "tokens1688_2_gpt-6-luna_semantic": {
+  "calendar": 33.333333333333336,
+  "currency": 100.0,
+  "non_additive": 62.5,
+  "denominator": 58.333333333333336,
+  "lifecycle": 33.333333333333336,
+  "sparse_completeness": 31.25
+ },
+ "ark_deepseek-v4-pro_dailsql": {
+  "calendar": 66.66666666666667,
+  "currency": 33.333333333333336,
+  "non_additive": 50.0,
+  "denominator": 33.333333333333336,
+  "lifecycle": 20.833333333333332,
+  "sparse_completeness": 0.0
+ },
+ "naive_surface": {
+  "calendar": 66.66666666666667,
+  "currency": 0.0,
+  "non_additive": 0.0,
+  "denominator": 0.0,
+  "lifecycle": 0.0,
+  "sparse_completeness": 0.0
+ }
+}

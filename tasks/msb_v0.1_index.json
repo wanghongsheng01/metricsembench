@@ -1,0 +1,783 @@
+{
+  "version": "v0.1",
+  "n_tasks": 85,
+  "counts": {
+    "type:calendar": 39,
+    "behavior:clarify": 21,
+    "sign_disagreement": 9,
+    "behavior:compute": 44,
+    "type:sparse_completeness": 14,
+    "behavior:refuse": 20,
+    "type:lifecycle": 9,
+    "type:currency": 6,
+    "type:non_additive": 8,
+    "type:denominator": 9
+  },
+  "tasks": [
+    {
+      "id": "msb_v0.1_cal_clarify_001",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": true,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for February 2000?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_002",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": true,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for calendar month February 2000 (2000-02-01 to 2000-02-29 vs 1999-02-01 to 1999-02-28)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_003",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": true,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for the rolling 30-day window ending 2000-02-29 (2000-01-31 to 2000-02-29 vs 1999-01-30 to 1999-02-28)?"
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_004",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": true,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Books category for February 2001?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_005",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": true,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Books category for calendar month February 2001 (2001-02-01 to 2001-02-28 vs 2000-02-01 to 2000-02-29)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_006",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": true,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Books category for the rolling 30-day window ending 2001-02-28 (2001-01-30 to 2001-02-28 vs 2000-01-31 to 2000-02-29)?"
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_007",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": true,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for February 2000?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_008",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": true,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for calendar month February 2000 (2000-02-01 to 2000-02-29 vs 1999-02-01 to 1999-02-28)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_009",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": true,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for the rolling 30-day window ending 2000-02-29 (2000-01-31 to 2000-02-29 vs 1999-01-30 to 1999-02-28)?"
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_010",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Men category for January 1999?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_011",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Men category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_012",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Men category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_013",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Home category for January 1999?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_014",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Home category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_015",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Home category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_016",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Jewelry category for January 1999?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_017",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Jewelry category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_018",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Jewelry category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_019",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Music category for January 1999?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_020",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Music category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_021",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Music category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_022",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for January 1999?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_023",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_024",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Sports category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_025",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for January 1999?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_026",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_027",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_028",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Shoes category for January 1999?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_029",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Shoes category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_030",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Shoes category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_clarify_031",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Children category for January 1999?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_cal_032",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Children category for calendar month January 1999 (1999-01-01 to 1999-01-31 vs 1998-01-01 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_compute_r30_033",
+      "type": "calendar",
+      "subtype": "month_vs_rolling30_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales in the Children category for the rolling 30-day window ending 1999-01-31 (1999-01-02 to 1999-01-31 vs 1998-01-02 to 1998-01-31)?"
+    },
+    {
+      "id": "msb_v0.1_cal_fy_clarify_2000",
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for 2000?"
+    },
+    {
+      "id": "msb_v0.1_cal_fy_compute_cal_2000",
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for calendar year 2000 (January 1 to December 31 2000 vs the same span in 1999)?"
+    },
+    {
+      "id": "msb_v0.1_cal_fy_compute_fy_2000",
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for retail fiscal year 2000 (February 1 2000 to January 31 2001 vs February 1 1999 to January 31 2000)?"
+    },
+    {
+      "id": "msb_v0.1_cal_fy_clarify_2001",
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for 2001?"
+    },
+    {
+      "id": "msb_v0.1_cal_fy_compute_cal_2001",
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for calendar year 2001 (January 1 to December 31 2001 vs the same span in 2000)?"
+    },
+    {
+      "id": "msb_v0.1_cal_fy_compute_fy_2001",
+      "type": "calendar",
+      "subtype": "calendar_year_vs_retail_fy_yoy",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the year-over-year growth rate of store net sales for retail fiscal year 2001 (February 1 2001 to January 31 2002 vs February 1 2000 to January 31 2001)?"
+    },
+    {
+      "id": "msb_v0.1_cal_refuse_incomplete_fy2002",
+      "type": "sparse_completeness",
+      "subtype": "incomplete_retail_fy",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "incomplete_period",
+      "question_en": "What was the year-over-year growth rate of store net sales for retail fiscal year 2002 (February 1 2002 to January 31 2003)?"
+    },
+    {
+      "id": "msb_v0.1_cal_refuse_incomplete_cy2003",
+      "type": "sparse_completeness",
+      "subtype": "incomplete_calendar_year",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "incomplete_period",
+      "question_en": "What were total store net sales for calendar year 2003 (January 1 to December 31 2003)?"
+    },
+    {
+      "id": "msb_v0.1_life_clarify_newshare_2000",
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What share of store net sales in calendar year 2000 came from new products?"
+    },
+    {
+      "id": "msb_v0.1_life_compute_firstsale_2000",
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What share of store net sales in calendar year 2000 came from items whose first-ever store sale occurred in 2000?"
+    },
+    {
+      "id": "msb_v0.1_life_compute_recstart_2000",
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What share of store net sales in calendar year 2000 came from items whose catalog record start date (i_rec_start_date) falls in 2000?"
+    },
+    {
+      "id": "msb_v0.1_life_clarify_newshare_2001",
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What share of store net sales in calendar year 2001 came from new products?"
+    },
+    {
+      "id": "msb_v0.1_life_compute_firstsale_2001",
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What share of store net sales in calendar year 2001 came from items whose first-ever store sale occurred in 2001?"
+    },
+    {
+      "id": "msb_v0.1_life_compute_recstart_2001",
+      "type": "lifecycle",
+      "subtype": "new_product_sales_share",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What share of store net sales in calendar year 2001 came from items whose catalog record start date (i_rec_start_date) falls in 2001?"
+    },
+    {
+      "id": "msb_v0.1_life_clarify_activerate_2001",
+      "type": "lifecycle",
+      "subtype": "active_item_rate_denominator",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the active-item rate of the catalog in calendar year 2001?"
+    },
+    {
+      "id": "msb_v0.1_life_compute_activerate_catalog_2001",
+      "type": "lifecycle",
+      "subtype": "active_item_rate_denominator",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What fraction of items in-catalog on 2001-06-30 (i_rec_start_date <= snapshot and i_rec_end_date is null or >= snapshot) had at least one store sale in calendar year 2001?"
+    },
+    {
+      "id": "msb_v0.1_life_compute_activerate_all_2001",
+      "type": "lifecycle",
+      "subtype": "active_item_rate_denominator",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What fraction of all item IDs in the item table had at least one store sale in calendar year 2001?"
+    },
+    {
+      "id": "msb_v0.1_ccy_clarify_2000",
+      "type": "currency",
+      "subtype": "raw_vs_usd_converted",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What were total store net sales in calendar year 2000?"
+    },
+    {
+      "id": "msb_v0.1_ccy_compute_usd_2000",
+      "type": "currency",
+      "subtype": "raw_vs_usd_converted",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What were total store net sales in calendar year 2000 in USD after converting each store's local currency with the frozen metricsem_fx_v1 rates?"
+    },
+    {
+      "id": "msb_v0.1_ccy_refuse_raw_as_usd_2000",
+      "type": "currency",
+      "subtype": "raw_sum_claimed_as_usd",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "currency_mix_no_fx",
+      "question_en": "Report a single USD total of store net sales for calendar year 2000 by summing ss_net_paid across all stores without conversion (treat every local amount as if it were already USD)."
+    },
+    {
+      "id": "msb_v0.1_ccy_clarify_2001",
+      "type": "currency",
+      "subtype": "raw_vs_usd_converted",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What were total store net sales in calendar year 2001?"
+    },
+    {
+      "id": "msb_v0.1_ccy_compute_usd_2001",
+      "type": "currency",
+      "subtype": "raw_vs_usd_converted",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What were total store net sales in calendar year 2001 in USD after converting each store's local currency with the frozen metricsem_fx_v1 rates?"
+    },
+    {
+      "id": "msb_v0.1_ccy_refuse_raw_as_usd_2001",
+      "type": "currency",
+      "subtype": "raw_sum_claimed_as_usd",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "currency_mix_no_fx",
+      "question_en": "Report a single USD total of store net sales for calendar year 2001 by summing ss_net_paid across all stores without conversion (treat every local amount as if it were already USD)."
+    },
+    {
+      "id": "msb_v0.1_nadd_compute_overall_aov_2000",
+      "type": "non_additive",
+      "subtype": "aov",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the overall average order value of store sales in calendar year 2000, defined as total ss_net_paid divided by the number of distinct tickets?"
+    },
+    {
+      "id": "msb_v0.1_nadd_refuse_sum_store_aov_2000",
+      "type": "non_additive",
+      "subtype": "aov_illegal_sum",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "non_additive_sum",
+      "question_en": "Report the total average order value for calendar year 2000 by summing the per-store average order values."
+    },
+    {
+      "id": "msb_v0.1_nadd_compute_margin_2000",
+      "type": "non_additive",
+      "subtype": "margin_rate",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the overall net-profit margin rate of store sales in calendar year 2000, defined as SUM(ss_net_profit) / SUM(ss_net_paid)?"
+    },
+    {
+      "id": "msb_v0.1_nadd_refuse_sum_margin_2000",
+      "type": "non_additive",
+      "subtype": "margin_rate_illegal_sum",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "non_additive_sum",
+      "question_en": "Report the total net-profit margin rate for calendar year 2000 by summing the per-store margin rates."
+    },
+    {
+      "id": "msb_v0.1_nadd_compute_overall_aov_2001",
+      "type": "non_additive",
+      "subtype": "aov",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the overall average order value of store sales in calendar year 2001, defined as total ss_net_paid divided by the number of distinct tickets?"
+    },
+    {
+      "id": "msb_v0.1_nadd_refuse_sum_store_aov_2001",
+      "type": "non_additive",
+      "subtype": "aov_illegal_sum",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "non_additive_sum",
+      "question_en": "Report the total average order value for calendar year 2001 by summing the per-store average order values."
+    },
+    {
+      "id": "msb_v0.1_nadd_compute_margin_2001",
+      "type": "non_additive",
+      "subtype": "margin_rate",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the overall net-profit margin rate of store sales in calendar year 2001, defined as SUM(ss_net_profit) / SUM(ss_net_paid)?"
+    },
+    {
+      "id": "msb_v0.1_nadd_refuse_sum_margin_2001",
+      "type": "non_additive",
+      "subtype": "margin_rate_illegal_sum",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "non_additive_sum",
+      "question_en": "Report the total net-profit margin rate for calendar year 2001 by summing the per-store margin rates."
+    },
+    {
+      "id": "msb_v0.1_den_clarify_return_2000",
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the store return rate in calendar year 2000?"
+    },
+    {
+      "id": "msb_v0.1_den_compute_return_amt_2000",
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the store return rate in calendar year 2000, defined as SUM(sr_return_amt) / SUM(ss_ext_sales_price)?"
+    },
+    {
+      "id": "msb_v0.1_den_compute_return_qty_2000",
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the store return rate in calendar year 2000, defined as SUM(sr_return_quantity) / SUM(ss_quantity)?"
+    },
+    {
+      "id": "msb_v0.1_den_clarify_return_2001",
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the store return rate in calendar year 2001?"
+    },
+    {
+      "id": "msb_v0.1_den_compute_return_amt_2001",
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the store return rate in calendar year 2001, defined as SUM(sr_return_amt) / SUM(ss_ext_sales_price)?"
+    },
+    {
+      "id": "msb_v0.1_den_compute_return_qty_2001",
+      "type": "denominator",
+      "subtype": "return_rate_amt_vs_qty",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What was the store return rate in calendar year 2001, defined as SUM(sr_return_quantity) / SUM(ss_quantity)?"
+    },
+    {
+      "id": "msb_v0.1_den_clarify_channel_2001",
+      "type": "denominator",
+      "subtype": "channel_scope",
+      "gold_behavior": "clarify",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What were total net sales in calendar year 2001?"
+    },
+    {
+      "id": "msb_v0.1_den_compute_store_2001",
+      "type": "denominator",
+      "subtype": "channel_scope",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What were total store-channel net sales (store_sales only) in calendar year 2001?"
+    },
+    {
+      "id": "msb_v0.1_den_compute_allch_2001",
+      "type": "denominator",
+      "subtype": "channel_scope",
+      "gold_behavior": "compute",
+      "sign_disagreement": false,
+      "refuse_reason": null,
+      "question_en": "What were total net sales across store, web, and catalog channels (SUM ss_net_paid + ws_net_paid + cs_net_paid) in calendar year 2001?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_001",
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "undefined_yoy",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAJCMCAAAA in calendar month October 2001 (versus October 2000)?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_002",
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "sparse_prior",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAFBGEAAAA in calendar month October 2001 (versus October 2000)?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_003",
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "sparse_prior",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAIEEDAAAA in calendar month October 2001 (versus October 2000)?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_004",
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "sparse_prior",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAACLOCAAAA in calendar month October 2001 (versus October 2000)?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_005",
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "sparse_prior",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAEFFAAAAA in calendar month October 2001 (versus October 2000)?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_006",
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "sparse_prior",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAFEBAAAAA in calendar month October 2001 (versus October 2000)?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_007",
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "sparse_prior",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAGLPAAAAA in calendar month October 2001 (versus October 2000)?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_item_008",
+      "type": "sparse_completeness",
+      "subtype": "item_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "sparse_prior",
+      "question_en": "What was the year-over-year growth rate of store net sales for item AAAAAAAAHHIAAAAA in calendar month October 2001 (versus October 2000)?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_brand_001",
+      "type": "sparse_completeness",
+      "subtype": "brand_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "undefined_yoy",
+      "question_en": "What was the year-over-year growth rate of store net sales for brand 'exportimaxi #4' in the Books category for calendar month February 2001?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_brand_002",
+      "type": "sparse_completeness",
+      "subtype": "brand_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "undefined_yoy",
+      "question_en": "What was the year-over-year growth rate of store net sales for brand 'corpmaxi #10' in the Books category for calendar month February 2001?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_brand_003",
+      "type": "sparse_completeness",
+      "subtype": "brand_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "undefined_yoy",
+      "question_en": "What was the year-over-year growth rate of store net sales for brand 'edu packunivamalg #4' in the Books category for calendar month February 2001?"
+    },
+    {
+      "id": "msb_v0.1_sparse_refuse_brand_004",
+      "type": "sparse_completeness",
+      "subtype": "brand_month_yoy_sparse_prior",
+      "gold_behavior": "refuse",
+      "sign_disagreement": false,
+      "refuse_reason": "undefined_yoy",
+      "question_en": "What was the year-over-year growth rate of store net sales for brand 'scholarunivamalg #10' in the Books category for calendar month February 2001?"
+    }
+  ]
+}

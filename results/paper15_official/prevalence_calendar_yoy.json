@@ -1,0 +1,64 @@
+{
+  "gate": {
+    "MIN_ABS_YOY": 0.01,
+    "magnitude_gap": 0.02,
+    "years": "1999-2002 complete prior-year windows",
+    "note": "Sign disagreement requires opposite signs AND both |YoY| >= 1 percentage point, matching the v0.1 selection gate (near-zero jitter excluded)."
+  },
+  "all_stores": {
+    "n_complete": 48,
+    "n_sign_disagreement": 1,
+    "rate_sign": 0.020833333333333332,
+    "n_magnitude_gap_ge_2pp": 3,
+    "rate_magnitude": 0.0625,
+    "n_decision_relevant": 40,
+    "rate_sign_among_decision_relevant": 0.025
+  },
+  "category": {
+    "n_complete": 480,
+    "n_sign_disagreement": 2,
+    "rate_sign": 0.004166666666666667,
+    "n_magnitude_gap_ge_2pp": 42,
+    "rate_magnitude": 0.0875,
+    "n_decision_relevant": 429,
+    "rate_sign_among_decision_relevant": 0.004662004662004662
+  },
+  "all_triples": {
+    "n_complete": 528,
+    "n_sign_disagreement": 3,
+    "rate_sign": 0.005681818181818182,
+    "n_magnitude_gap_ge_2pp": 45,
+    "rate_magnitude": 0.08522727272727272,
+    "n_decision_relevant": 469,
+    "rate_sign_among_decision_relevant": 0.006396588486140725
+  },
+  "flagship_sign_flips": [
+    {
+      "scope": "all_stores",
+      "yr": 2000,
+      "moy": 2,
+      "cat": null,
+      "cal_yoy": 0.019240434007704827,
+      "r30_yoy": -0.01157354229134519,
+      "gap": 0.030813976299050017
+    },
+    {
+      "scope": "category",
+      "yr": 2000,
+      "moy": 2,
+      "cat": "Sports",
+      "cal_yoy": 0.02675474261275888,
+      "r30_yoy": -0.020158199479935683,
+      "gap": 0.04691294209269456
+    },
+    {
+      "scope": "category",
+      "yr": 2001,
+      "moy": 2,
+      "cat": "Books",
+      "cal_yoy": -0.0206803736465282,
+      "r30_yoy": 0.012058014513217705,
+      "gap": 0.032738388159745904
+    }
+  ]
+}

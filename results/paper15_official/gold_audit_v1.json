@@ -1,0 +1,171 @@
+{
+  "v0.1": {
+    "path": "./tasks/msb_v0.1_tasks.json",
+    "n": 85,
+    "n_declared": 85,
+    "counts_declared": {
+      "type:calendar": 39,
+      "behavior:clarify": 21,
+      "sign_disagreement": 9,
+      "behavior:compute": 44,
+      "type:sparse_completeness": 14,
+      "behavior:refuse": 20,
+      "type:lifecycle": 9,
+      "type:currency": 6,
+      "type:non_additive": 8,
+      "type:denominator": 9
+    },
+    "behaviors": {
+      "clarify": 21,
+      "compute": 44,
+      "refuse": 20
+    },
+    "types": {
+      "calendar": 39,
+      "sparse_completeness": 14,
+      "lifecycle": 9,
+      "currency": 6,
+      "non_additive": 8,
+      "denominator": 9
+    },
+    "subtypes": {
+      "month_vs_rolling30_yoy": 33,
+      "calendar_year_vs_retail_fy_yoy": 6,
+      "incomplete_retail_fy": 1,
+      "incomplete_calendar_year": 1,
+      "new_product_sales_share": 6,
+      "active_item_rate_denominator": 3,
+      "raw_vs_usd_converted": 4,
+      "raw_sum_claimed_as_usd": 2,
+      "aov": 2,
+      "aov_illegal_sum": 2,
+      "margin_rate": 2,
+      "margin_rate_illegal_sum": 2,
+      "return_rate_amt_vs_qty": 6,
+      "channel_scope": 3,
+      "item_month_yoy_sparse_prior": 8,
+      "brand_month_yoy_sparse_prior": 4
+    },
+    "evaluated": null,
+    "sha_field": null,
+    "raw_rehash": "978783fa8c29bb87d2e0e678ddd19dff5f1e7757c9e0ba3c7f26a62595371bee",
+    "freeze_sha": "e37985160ef9c3896cd3cd915b23783c9c9dffaaeee10ac8f63896296c3f154c",
+    "issues": [
+      "see ok block"
+    ],
+    "ok": {
+      "n_compute": 44,
+      "n_clarify": 21,
+      "n_refuse": 20,
+      "gold_sql_checked": 44,
+      "gold_sql_match": 44,
+      "paired_checked": 142,
+      "paired_match": 142,
+      "handbook_struct_ok": 83,
+      "handbook_struct_fail": [
+        [
+          "msb_v0.1_life_clarify_activerate_2001",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_v0.1_den_clarify_return_2000",
+          "paired values equal — not a real conflict"
+        ]
+      ],
+      "unique_ids": true,
+      "unique_questions": true,
+      "n_sign_disagreement": 9
+    }
+  },
+  "p15_heldout_v1": {
+    "path": "./tasks/msb_p15_heldout_v1_tasks.json",
+    "n": 94,
+    "n_declared": 94,
+    "counts_declared": {
+      "type:calendar": 48,
+      "behavior:clarify": 26,
+      "behavior:compute": 54,
+      "type:lifecycle": 12,
+      "type:currency": 6,
+      "behavior:refuse": 14,
+      "type:non_additive": 8,
+      "type:denominator": 12,
+      "type:sparse_completeness": 8
+    },
+    "behaviors": {
+      "clarify": 26,
+      "compute": 54,
+      "refuse": 14
+    },
+    "types": {
+      "calendar": 48,
+      "lifecycle": 12,
+      "currency": 6,
+      "non_additive": 8,
+      "denominator": 12,
+      "sparse_completeness": 8
+    },
+    "subtypes": {
+      "month_vs_rolling30_yoy": 48,
+      "new_product_sales_share": 6,
+      "active_item_rate_denominator": 6,
+      "raw_vs_usd_converted": 4,
+      "raw_sum_claimed_as_usd": 2,
+      "aov": 2,
+      "aov_illegal_sum": 2,
+      "margin_rate": 2,
+      "margin_rate_illegal_sum": 2,
+      "return_rate_amt_vs_qty": 6,
+      "channel_scope": 6,
+      "item_month_yoy_sparse_prior": 4,
+      "brand_month_yoy_sparse_prior": 4
+    },
+    "evaluated": true,
+    "sha_field": "03d26b59479d82ee7d6e71bb73f6bedc4db42204cf8c9d9124604adb53e55cb2",
+    "raw_rehash": "c2e23793cf3ab6391b865eef38bbb34cb9ccc7a855c216161850a3799efefbac",
+    "freeze_sha": "03d26b59479d82ee7d6e71bb73f6bedc4db42204cf8c9d9124604adb53e55cb2",
+    "issues": [
+      "see ok block"
+    ],
+    "ok": {
+      "n_compute": 54,
+      "n_clarify": 26,
+      "n_refuse": 14,
+      "gold_sql_checked": 54,
+      "gold_sql_match": 54,
+      "paired_checked": 172,
+      "paired_match": 172,
+      "handbook_struct_ok": 89,
+      "handbook_struct_fail": [
+        [
+          "msb_p15_heldout_v1_cal_clarify_031",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v1_cal_clarify_034",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v1_life_clarify_activerate_1999",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v1_life_clarify_newshare_2002",
+          "paired values equal — not a real conflict"
+        ],
+        [
+          "msb_p15_heldout_v1_life_clarify_activerate_2002",
+          "paired values equal — not a real conflict"
+        ]
+      ],
+      "unique_ids": true,
+      "unique_questions": true,
+      "n_sign_disagreement": 0
+    }
+  },
+  "overlap": {
+    "id_overlap": [],
+    "question_overlap": []
+  },
+  "note": "Mechanical verification (re-execution + handbook structure). Not a dual-human Cohen's kappa."
+}

@@ -1,0 +1,298 @@
+{
+  "fold": "v0.1 (DEV)",
+  "role": "DEV sensitivity analysis; official folds and frozen card unchanged",
+  "bootstrap": {
+    "n": 10000,
+    "seed": 20261112
+  },
+  "systems": {
+    "tokens1688_2_claude-opus-5_semantic_max": {
+      "summary": {
+        "n": 85,
+        "n_compute": 44,
+        "n_clarify": 21,
+        "n_refuse": 20,
+        "TA": {
+          "n": 85,
+          "mean": 0.7764705882352941,
+          "ci_low": 0.6823529411764706,
+          "ci_high": 0.8588235294117647,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "compute_accuracy": {
+          "n": 44,
+          "mean": 0.9545454545454546,
+          "ci_low": 0.8863636363636364,
+          "ci_high": 1.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "FAR_on_clarify_or_refuse": {
+          "n": 41,
+          "mean": 0.3902439024390244,
+          "ci_low": 0.24390243902439024,
+          "ci_high": 0.5365853658536586,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "CRR": {
+          "n": 20,
+          "mean": 0.85,
+          "ci_low": 0.7,
+          "ci_high": 1.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "missed_clarify": {
+          "n": 21,
+          "mean": 0.6190476190476191,
+          "ci_low": 0.42857142857142855,
+          "ci_high": 0.8095238095238095,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "unnecessary_clarify": {
+          "n": 44,
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "DSR": {
+          "n": 44,
+          "mean": 0.045454545454545456,
+          "ci_low": 0.0,
+          "ci_high": 0.11363636363636363,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "IllegalYoY": {
+          "n": 14,
+          "mean": 0.21428571428571427,
+          "ci_low": 0.0,
+          "ci_high": 0.42857142857142855,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "IllegalAgg": {
+          "n": 6,
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        }
+      },
+      "vs_frozen": {
+        "n": 85,
+        "diff": 0.2,
+        "ci_low": 0.058823529411764705,
+        "ci_high": 0.3411764705882353,
+        "p_boot": 0.0094,
+        "n_boot": 10000,
+        "seed": 20261112,
+        "ci_excludes_zero": true,
+        "lower_better": false
+      },
+      "usd_sql": 2,
+      "usd_sql_frozen": 16,
+      "fx_ucr": 0,
+      "fx_ucr_frozen": 16,
+      "spend": 2.2149
+    },
+    "tokens1688_2_claude-opus-5-5_semantic_high": {
+      "summary": {
+        "n": 85,
+        "n_compute": 44,
+        "n_clarify": 21,
+        "n_refuse": 20,
+        "TA": {
+          "n": 85,
+          "mean": 0.6941176470588235,
+          "ci_low": 0.5882352941176471,
+          "ci_high": 0.788235294117647,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "compute_accuracy": {
+          "n": 44,
+          "mean": 0.9318181818181818,
+          "ci_low": 0.8409090909090909,
+          "ci_high": 1.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "FAR_on_clarify_or_refuse": {
+          "n": 41,
+          "mean": 0.5609756097560976,
+          "ci_low": 0.4146341463414634,
+          "ci_high": 0.7073170731707317,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "CRR": {
+          "n": 20,
+          "mean": 0.65,
+          "ci_low": 0.45,
+          "ci_high": 0.85,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "missed_clarify": {
+          "n": 21,
+          "mean": 0.7619047619047619,
+          "ci_low": 0.5714285714285714,
+          "ci_high": 0.9523809523809523,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "unnecessary_clarify": {
+          "n": 44,
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "DSR": {
+          "n": 44,
+          "mean": 0.045454545454545456,
+          "ci_low": 0.0,
+          "ci_high": 0.11363636363636363,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "IllegalYoY": {
+          "n": 14,
+          "mean": 0.5,
+          "ci_low": 0.21428571428571427,
+          "ci_high": 0.7857142857142857,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "IllegalAgg": {
+          "n": 6,
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        }
+      },
+      "vs_frozen": {
+        "n": 85,
+        "diff": 0.1411764705882353,
+        "ci_low": 0.0,
+        "ci_high": 0.2823529411764706,
+        "p_boot": 0.0626,
+        "n_boot": 10000,
+        "seed": 20261112,
+        "ci_excludes_zero": false,
+        "lower_better": false
+      },
+      "usd_sql": 2,
+      "usd_sql_frozen": 22,
+      "fx_ucr": 0,
+      "fx_ucr_frozen": 8,
+      "spend": 1.6853
+    },
+    "tokens1688_2_gpt-6-luna_semantic": {
+      "summary": {
+        "n": 85,
+        "n_compute": 44,
+        "n_clarify": 21,
+        "n_refuse": 20,
+        "TA": {
+          "n": 85,
+          "mean": 0.7176470588235294,
+          "ci_low": 0.6235294117647059,
+          "ci_high": 0.8117647058823529,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "compute_accuracy": {
+          "n": 44,
+          "mean": 0.8181818181818182,
+          "ci_low": 0.7045454545454546,
+          "ci_high": 0.9318181818181818,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "FAR_on_clarify_or_refuse": {
+          "n": 41,
+          "mean": 0.2682926829268293,
+          "ci_low": 0.14634146341463414,
+          "ci_high": 0.4146341463414634,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "CRR": {
+          "n": 20,
+          "mean": 0.85,
+          "ci_low": 0.7,
+          "ci_high": 1.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "missed_clarify": {
+          "n": 21,
+          "mean": 0.38095238095238093,
+          "ci_low": 0.19047619047619047,
+          "ci_high": 0.6190476190476191,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "unnecessary_clarify": {
+          "n": 44,
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "DSR": {
+          "n": 44,
+          "mean": 0.045454545454545456,
+          "ci_low": 0.0,
+          "ci_high": 0.11363636363636363,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "IllegalYoY": {
+          "n": 14,
+          "mean": 0.21428571428571427,
+          "ci_low": 0.0,
+          "ci_high": 0.42857142857142855,
+          "n_boot": 10000,
+          "seed": 20261112
+        },
+        "IllegalAgg": {
+          "n": 6,
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_boot": 10000,
+          "seed": 20261112
+        }
+      },
+      "vs_frozen": {
+        "n": 85,
+        "diff": 0.29411764705882354,
+        "ci_low": 0.1411764705882353,
+        "ci_high": 0.43529411764705883,
+        "p_boot": 0.0002,
+        "n_boot": 10000,
+        "seed": 20261112,
+        "ci_excludes_zero": true,
+        "lower_better": false
+      },
+      "usd_sql": 2,
+      "usd_sql_frozen": 2,
+      "fx_ucr": 0,
+      "fx_ucr_frozen": 34,
+      "spend": 0.0282
+    }
+  }
+}
